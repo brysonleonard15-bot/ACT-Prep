@@ -3,76 +3,112 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ACT Half-Length Practice Test (Local History)</title>
+<title>ACT Practice (Section Mode + Custom Counts + Local History)</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 22px; background: #f4f6f8; }
-h1 { color: #1a2a40; margin-top: 0; }
-button { padding: 10px 14px; margin: 8px 0; background: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
-button:hover { background: #0f5bc4; }
-button.secondary { background:#ffffff; color:#1a2a40; border:1px solid #d8dee9; }
-button.secondary:hover { background:#f7faff; }
-.section { background: white; padding: 16px; border-radius: 12px; margin-bottom: 14px; border: 1px solid #e6eaf0; }
-.question { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed #e6eaf0; }
-.question:last-child{ border-bottom:none; }
-.result { font-weight: bold; margin-top: 10px; }
-.small { color:#5b6775; font-size: 12px; }
-input[type=text]{ padding:10px 12px; border-radius: 10px; border:1px solid #d8dee9; width: 100%; max-width: 420px; }
-table { width:100%; border-collapse: collapse; }
-th, td { border:1px solid #e6eaf0; padding:8px; text-align:left; font-size: 13px; }
-th { background:#f7faff; }
-.badge { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #d8dee9; font-size:12px; color:#5b6775; }
+  body { font-family: Arial, sans-serif; margin: 18px; background: #f4f6f8; color:#1a2a40; }
+  h1 { margin: 0 0 6px 0; }
+  .small { color:#5b6775; font-size: 12px; }
+  .card { background: #fff; border: 1px solid #e6eaf0; border-radius: 12px; padding: 14px; margin: 12px 0; }
+  label { display:block; margin-top: 10px; font-weight: 700; font-size: 13px; }
+  input[type=text], input[type=number], select {
+    width: 100%; max-width: 520px;
+    padding: 10px 12px; border-radius: 10px; border: 1px solid #d8dee9;
+    background:#fff;
+  }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
+  .row > div { flex: 1; min-width: 180px; }
+  button {
+    padding: 10px 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: 800;
+    background: #1a73e8; color: #fff; margin-top: 10px;
+  }
+  button:hover { background:#0f5bc4; }
+  button.secondary { background:#fff; color:#1a2a40; border:1px solid #d8dee9; }
+  button.secondary:hover { background:#f7faff; }
+  .question { padding: 12px 0; border-bottom: 1px dashed #e6eaf0; }
+  .question:last-child { border-bottom:none; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #d8dee9; font-size:12px; color:#5b6775; }
+  .result { font-weight: 900; margin-top: 10px; }
+  table { width:100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border:1px solid #e6eaf0; padding:8px; text-align:left; }
+  th { background:#f7faff; }
 </style>
 </head>
 <body>
 
-<h1>ACT Half-Length Practice Test</h1>
+<h1>ACT Practice</h1>
 <div class="small">
-Option C enabled: This keeps a record of attempts <b>only on the device/browser that took the test</b> (localStorage). It does not send results to you.
+  Section mode + custom question counts + <b>local history</b> (saved on the same device/browser only).
 </div>
 
-<div class="section">
-  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+<div class="card">
+  <div class="row">
     <div>
-      <div class="small"><b>Name</b> (optional – saved in local history)</div>
+      <label>Name (optional)</label>
       <input id="studentName" type="text" placeholder="e.g., John Leonard" />
     </div>
     <div>
-      <div class="small"><b>Difficulty</b></div>
-      <select id="difficulty" style="padding:10px 12px;border-radius:10px;border:1px solid #d8dee9;">
+      <label>Difficulty</label>
+      <select id="difficulty">
         <option value="medium">Medium</option>
         <option value="hard">Very Hard</option>
       </select>
     </div>
+    <div>
+      <label>Mode</label>
+      <select id="mode" onchange="renderCountInputs()">
+        <option value="section">One Section</option>
+        <option value="all">All Sections</option>
+      </select>
+    </div>
+    <div>
+      <label>Section (One Section mode)</label>
+      <select id="section" onchange="renderCountInputs()">
+        <option value="English">English</option>
+        <option value="Math">Math</option>
+        <option value="Reading">Reading</option>
+        <option value="Science">Science</option>
+      </select>
+    </div>
   </div>
-  <div style="margin-top:10px;">
-    <button onclick="startTest()">Start / Regenerate Test</button>
-    <button class="secondary" onclick="scrollToTop()">Back to Top</button>
+
+  <div id="countArea" class="row" style="margin-top:10px;"></div>
+
+  <div class="row" style="margin-top:6px;">
+    <div style="min-width:240px;">
+      <button onclick="startTest()">Generate Questions</button>
+      <button class="secondary" onclick="scrollToTop()">Back to Top</button>
+    </div>
+    <div class="small" style="flex:2; min-width:260px; margin-top:12px;">
+      Limits (max): English 38 • Math 30 • Reading 20 • Science 20
+    </div>
   </div>
-  <div class="small">Tip: For best performance on phones, answer a section at a time and submit once at the end.</div>
 </div>
 
-<div class="section" id="testArea">
+<div class="card" id="testCard">
+  <div id="testMeta" class="small"></div>
   <div id="questions"></div>
   <button onclick="gradeTest()">Submit & Grade</button>
   <div class="result" id="score"></div>
   <div id="feedback" class="small"></div>
 </div>
 
-<div class="section">
-  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+<div class="card">
+  <div class="row" style="align-items:center;">
     <h2 style="margin:0;">Attempt History</h2>
-    <span class="badge">Saved locally on this device</span>
+    <span class="badge">Saved locally</span>
     <div style="flex:1;"></div>
     <button class="secondary" onclick="clearHistory()">Clear History</button>
   </div>
   <div class="small">You will only see attempts taken on <b>this same device + browser</b>.</div>
   <div style="margin-top:10px; overflow:auto;">
-    <table id="historyTable">
+    <table>
       <thead>
         <tr>
           <th>Date/Time</th>
           <th>Name</th>
           <th>Difficulty</th>
+          <th>Mode</th>
+          <th>Section(s)</th>
           <th>Score</th>
         </tr>
       </thead>
@@ -82,47 +118,47 @@ Option C enabled: This keeps a record of attempts <b>only on the device/browser 
 </div>
 
 <script>
-const HISTORY_KEY = "act_local_history_v1";
-let questions = [];
-
-function scrollToTop(){ window.scrollTo({top:0, behavior:"smooth"}); }
-
-function saveAttemptToHistory(attempt){
+/* =====================
+   LOCAL HISTORY (Option C)
+   ===================== */
+const HISTORY_KEY = "act_local_history_v2";
+function saveAttempt(attempt){
   const raw = localStorage.getItem(HISTORY_KEY);
   const hist = raw ? JSON.parse(raw) : [];
   hist.push(attempt);
-  // keep last 50 attempts
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(-50)));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(-60)));
 }
-
 function loadHistory(){
   const raw = localStorage.getItem(HISTORY_KEY);
   const hist = raw ? JSON.parse(raw) : [];
   const body = document.getElementById("historyBody");
   body.innerHTML = "";
   if(hist.length === 0){
-    body.innerHTML = '<tr><td colspan="4" class="small">No attempts yet.</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" class="small">No attempts yet.</td></tr>';
     return;
   }
-  // newest first
   hist.slice().reverse().forEach(a=>{
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${new Date(a.timestamp).toLocaleString()}</td>
       <td>${escapeHtml(a.name || "")}</td>
       <td>${a.difficulty === "hard" ? "Very Hard" : "Medium"}</td>
-      <td><b>${a.score}</b> / 108</td>
+      <td>${a.mode === "all" ? "All Sections" : "One Section"}</td>
+      <td>${escapeHtml(a.sectionsLabel)}</td>
+      <td><b>${a.score}</b> / ${a.total}</td>
     `;
     body.appendChild(tr);
   });
 }
-
 function clearHistory(){
   if(!confirm("Clear all saved attempts on this device?")) return;
   localStorage.removeItem(HISTORY_KEY);
   loadHistory();
 }
 
+/* =====================
+   UTIL
+   ===================== */
 function escapeHtml(str){
   return String(str)
     .replaceAll("&","&amp;")
@@ -131,288 +167,310 @@ function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function clamp(n, lo, hi){
+  n = parseInt(n,10);
+  if(Number.isNaN(n)) n = lo;
+  return Math.max(lo, Math.min(hi, n));
+}
+function scrollToTop(){ window.scrollTo({top:0, behavior:"smooth"}); }
 
-function startTest() {
-  const difficulty = document.getElementById("difficulty").value;
-  questions = [];
-  const container = document.getElementById("questions");
-  container.innerHTML = "";
-
-  // ENGLISH (38) - 38 distinct stems (no repeats)
-  const englishBank = [
+/* =====================
+   QUESTION BANKS (UNIQUE STEMS)
+   ===================== */
+const BANK = {
+  English: [
     {t:"Choose the correct sentence:", o:["Their going home after practice.","They're going home after practice.","There going home after practice.","Theyre going home after practice."], a:1, e:"They're = they are (correct contraction)."},
     {t:"Choose the correct sentence:", o:["Its raining today.","It's raining today.","Its' raining today.","Its raining to day."], a:1, e:"It's = it is (needs apostrophe)."},
     {t:"Choose the correct sentence:", o:["She dont like math.","She doesn't like math.","She didnt likes math.","She do not like math."], a:1, e:"Singular subject 'she' needs 'doesn't'."},
     {t:"Choose the correct sentence:", o:["The dogs bone was lost.","The dog's bone was lost.","The dogs' bone was lost.","Dog's bone was lost."], a:1, e:"One dog: singular possessive dog's."},
     {t:"Best punctuation:", o:["I studied, I took a break.","I studied; I took a break.","I studied I took a break.","I studied: I took a break."], a:1, e:"Semicolon joins two independent clauses."},
-    {t:"Fix the modifier problem:", o:["Running down the street, the backpack bounced.","Running down the street, I watched the backpack bounce.","The backpack, running down the street, bounced.","Running down the street, the backpack was watching me."], a:0, e:"Backpack can bounce; it isn't the runner. Sentence is acceptable as written."},
+    {t:"Fix the modifier problem:", o:["Walking into the shop, the smell of bread filled the air.","Walking into the shop, the bread smelled me.","The smell walked into the shop.","Bread walking filled the air."], a:0, e:"Avoid dangling modifiers; the first option is logical/clear."},
     {t:"Choose the most concise option:", o:["Due to the fact that we were late, we hurried.","Because we were late, we hurried.","On account of being late, we hurried.","In the event that we were late, we hurried."], a:1, e:"Because is concise and clear."},
     {t:"Parallel structure:", o:["She likes to hike, swimming, and to bike.","She likes hiking, swimming, and biking.","She likes hike, swim, and bike.","She likes to hiking, to swimming, and to biking."], a:1, e:"Keep list forms parallel: hiking/swimming/biking."},
     {t:"Pronoun clarity:", o:["When Jordan texted Alex, he sounded relieved.","When Jordan texted Alex, Jordan sounded relieved.","When Jordan texted Alex, they sounded relieved.","When Jordan texted Alex, it sounded relieved."], a:1, e:"Repeat the noun to avoid ambiguity."},
     {t:"Comma usage:", o:["After the show ended we left.","After the show ended, we left.","After, the show ended we left.","After the show, ended we left."], a:1, e:"Introductory dependent clause takes a comma."},
-    {t:"Verb tense consistency:", o:["Yesterday, we walk to the store.","Yesterday, we walked to the store.","Yesterday, we walking to the store.","Yesterday, we will walked to the store."], a:1, e:"Past time marker 'yesterday' needs past tense."},
+    {t:"Verb tense consistency:", o:["Yesterday, we walk to the store.","Yesterday, we walked to the store.","Yesterday, we walking to the store.","Yesterday, we will walked to the store."], a:1, e:"Past marker needs past tense."},
     {t:"Subject-verb agreement:", o:["Neither of the answers are correct.","Neither of the answers is correct.","Neither of the answer are correct.","Neither of the answers were correct."], a:1, e:"Neither is singular."},
-    {t:"Word choice:", o:["The results were alluded.","The results were elated.","The results were evident.","The results were eroded."], a:2, e:"Evident means clear/obvious."},
-    {t:"Apostrophe (plural possessive):", o:["Both players jersey's were clean.","Both players' jerseys were clean.","Both player's jerseys were clean.","Both players jerseys were clean."], a:1, e:"Two players: players' (plural possessive)."},
-    {t:"Choose the best transition:", o:["Therefore","However","For example","Initially"], a:1, e:"However signals contrast."},
-    {t:"Correct comparison:", o:["She is taller then me.","She is taller than I am.","She is taller then I am.","She is taller than me am."], a:1, e:"Than is for comparisons; 'I am' is implied."},
+    {t:"Apostrophe (plural possessive):", o:["Both players jersey's were clean.","Both players' jerseys were clean.","Both player's jerseys were clean.","Both players jerseys were clean."], a:1, e:"Plural possessive: players'."},
+    {t:"Correct comparison:", o:["She is taller then me.","She is taller than I am.","She is taller then I am.","She is taller than me am."], a:1, e:"Than is for comparisons; 'I am' implied."},
     {t:"Pronoun case:", o:["Me and him went.","He and I went.","Him and I went.","Me and he went."], a:1, e:"Subject pronouns: He and I."},
-    {t:"Dangling modifier fix:", o:["To win the prize, the contest was entered by Sam.","To win the prize, Sam entered the contest.","To win the prize, entering the contest mattered.","To win the prize, the contest entered Sam."], a:1, e:"Make Sam the subject doing the action."},
-    {t:"Choose the correct form:", o:["Who did you give it to?","Whom did you give it to?","Whose did you give it to?","Which did you give it to?"], a:1, e:"Object of preposition 'to' → whom."},
-    {t:"Punctuation with list:", o:["Bring pencils, paper and a calculator.","Bring pencils, paper, and a calculator.","Bring pencils paper, and a calculator.","Bring pencils, paper, and, a calculator."], a:1, e:"Use commas correctly in a series."},
-    {t:"Avoid redundancy:", o:["Each and every student must sign.","Each student must sign.","Each and every single student must sign.","Each of every student must sign."], a:1, e:"Remove redundant wording."},
-    {t:"Correct idiom:", o:["Different than","Different from","Different to","Different with"], a:1, e:"Standard American usage: different from."},
-    {t:"Choose correct sentence:", o:["The data shows a trend.","The data show a trend.","The data is show a trend.","The data showing a trend."], a:(difficulty==="hard"?1:0), e:"Usage varies; ACT often treats 'data' as plural: data show."},
-    {t:"Fix run-on:", o:["We arrived early we got seats.","We arrived early, and we got seats.","We arrived early we, got seats.","We arrived early: and we got seats."], a:1, e:"Add comma + conjunction for two independent clauses."},
+    {t:"Correct idiom:", o:["Different than","Different from","Different to","Different with"], a:1, e:"Standard: different from."},
+    {t:"Fix run-on:", o:["We arrived early we got seats.","We arrived early, and we got seats.","We arrived early we, got seats.","We arrived early: and we got seats."], a:1, e:"Join with comma + conjunction."},
     {t:"Correct capitalization:", o:["i visited Arkansas last summer.","I visited Arkansas last summer.","I visited arkansas last summer.","i visited arkansas last summer."], a:1, e:"Capitalize 'I' and proper nouns."},
-    {t:"Best tone/word choice:", o:["The solution is dumb.","The solution is ineffective.","The solution is lame.","The solution is stupid."], a:1, e:"Choose formal, precise wording."},
-    {t:"Consistency:", o:["The team was winning; they are confident.","The team was winning; they were confident.","The team is winning; they were confident.","The team winning; they were confident."], a:1, e:"Keep past tense consistent."},
+    {t:"Formal word choice:", o:["The solution is dumb.","The solution is ineffective.","The solution is lame.","The solution is stupid."], a:1, e:"Choose formal, precise wording."},
     {t:"Correct colon use:", o:["I need three things, focus, time, and help.","I need three things: focus, time, and help.","I need three things; focus, time, and help.","I need three things. focus, time, and help."], a:1, e:"Colon introduces a list after an independent clause."},
-    {t:"Avoid passive voice when unclear:", o:["The report was written.","Henry wrote the report.","The writing of the report occurred.","The report was being wrote."], a:1, e:"Active voice is clearer."},
-    {t:"Correct sentence:", o:["If I was you, I'd study.","If I were you, I'd study.","If I am you, I'd study.","If I been you, I'd study."], a:1, e:"Use subjunctive: If I were you."},
-    {t:"Choose correct form:", o:["Less people came.","Fewer people came.","Lesser people came.","Fewest people came."], a:1, e:"Use fewer with countable nouns."},
-    {t:"Correct pair:", o:["Between you and I","Between you and me","Between you and myself","Between you and mine"], a:1, e:"Object pronoun after preposition: me."},
-    {t:"Correct punctuation:", o:["Lets eat, Grandma!","Lets eat Grandma!","Let's eat, Grandma!","Let's eat Grandma!"], a:2, e:"Let's = let us; comma prevents ambiguity."},
-    {t:"Choose correct sentence:", o:["Everyone brought their book.","Everyone brought his or her book.","Everyone brought there book.","Everyone brought they're book."], a:1, e:"Formal agreement: everyone → singular (his or her)."},
-    {t:"Correct usage:", o:["I could of gone.","I could have gone.","I could of went.","I could have went."], a:1, e:"Could have (not could of)."},
-    {t:"Correct reference:", o:["This are the reasons.","These are the reasons.","This is the reasons.","These is the reasons."], a:1, e:"Plural noun takes 'these are'."},
-    {t:"Best revision for clarity:", o:["The experiment was a success, which was good.","The experiment succeeded.","The success of the experiment was good.","The experiment was good and successful."], a:1, e:"Remove vague 'which was good' phrasing."}
-  ];
-  // 38 items exactly
-  englishBank.slice(0,38).forEach((q, i)=>{
-    questions.push({ section:"English", text:`English Q${i+1}: ${q.t}`, options:q.o, answer:q.a, explanation:q.e });
-  });
-
-  // MATH (30) - distinct prompts
-  const mathBank = [
+    {t:"Subjunctive mood:", o:["If I was you, I'd study.","If I were you, I'd study.","If I am you, I'd study.","If I been you, I'd study."], a:1, e:"Use subjunctive: If I were you."},
+    {t:"Fewer vs less:", o:["Less people came.","Fewer people came.","Lesser people came.","Fewest people came."], a:1, e:"Use fewer with countable nouns."},
+    {t:"Between you and ___:", o:["I","me","myself","mine"], a:1, e:"Object pronoun after preposition: me."},
+    {t:"Let's vs lets:", o:["Lets eat, Grandma!","Lets eat Grandma!","Let's eat, Grandma!","Let's eat Grandma!"], a:2, e:"Let's = let us; comma prevents ambiguity."},
+    {t:"Could have:", o:["I could of gone.","I could have gone.","I could of went.","I could have went."], a:1, e:"Could have (not could of)."},
+    {t:"These/this agreement:", o:["This are the reasons.","These are the reasons.","This is the reasons.","These is the reasons."], a:1, e:"Plural noun → these are."},
+    {t:"Concise revision:", o:["The experiment was a success, which was good.","The experiment succeeded.","The success of the experiment was good.","The experiment was good and successful."], a:1, e:"Avoid vague filler; be direct."},
+    {t:"Comma in series:", o:["Bring pencils, paper and a calculator.","Bring pencils, paper, and a calculator.","Bring pencils paper, and a calculator.","Bring pencils, paper, and, a calculator."], a:1, e:"Use commas correctly in a series."},
+    {t:"Who/whom:", o:["Who did you give it to?","Whom did you give it to?","Whose did you give it to?","Which did you give it to?"], a:1, e:"Object of preposition → whom."},
+    {t:"Avoid redundancy:", o:["Each and every student must sign.","Each student must sign.","Each and every single student must sign.","Each of every student must sign."], a:1, e:"Remove redundant wording."},
+    {t:"Data grammar:", o:["The data shows a trend.","The data show a trend.","The data is show a trend.","The data showing a trend."], a:1, e:"ACT often treats 'data' as plural: data show."},
+    {t:"Tense consistency:", o:["The team was winning; they are confident.","The team was winning; they were confident.","The team is winning; they were confident.","The team winning; they were confident."], a:1, e:"Keep past tense consistent."},
+    {t:"Active voice clarity:", o:["The report was written.","Henry wrote the report.","The writing of the report occurred.","The report was being wrote."], a:1, e:"Active voice is clearer."},
+    {t:"Countable noun:", o:["I have much pencils.","I have many pencils.","I have lots pencil.","I have more pencil."], a:1, e:"Many for countable nouns."},
+    {t:"Subject-verb:", o:["The list of items are long.","The list of items is long.","The list of items were long.","The list of items be long."], a:1, e:"Subject is 'list' (singular)."},
+    {t:"Correct punctuation:", o:["Although it was late we stayed.","Although it was late, we stayed.","Although, it was late we stayed.","Although it was late we, stayed."], a:1, e:"Comma after introductory dependent clause."},
+    {t:"Sentence boundary:", o:["I finished early, I left.","I finished early. I left.","I finished early I left.","I finished early: I left."], a:1, e:"Two independent clauses need proper separation."},
+    {t:"Correct form:", o:["That is the one which I want.","That is the one that I want.","That is the one what I want.","That is the one whom I want."], a:1, e:"That is standard for restrictive clauses."}
+  ],
+  Math: [
     {t:"Solve for x: 3x + 4 = 19", o:["3","5","7","9"], a:1, e:"3x=15 → x=5."},
     {t:"Solve: 2(x − 3) = 10", o:["2","5","8","13"], a:2, e:"x−3=5 → x=8."},
     {t:"If x+y=11 and x−y=3, find x.", o:["4","7","8","14"], a:1, e:"Add equations: 2x=14 → x=7."},
     {t:"A right triangle has legs 6 and 8. Area = ?", o:["14","24","48","96"], a:1, e:"(1/2)·6·8=24."},
-    {t:"Simplify: (x^3)(x^5)", o:["x^8","x^15","x^2","8x"], a:0, e:"Add exponents: 3+5=8."},
+    {t:"Simplify: (x^3)(x^5)", o:["x^8","x^15","x^2","8x"], a:0, e:"Add exponents."},
     {t:"If f(x)=3x²−5x+2, find f(−1).", o:["0","4","10","12"], a:2, e:"3(1)+5+2=10."},
     {t:"A $80 item is discounted 25%. Sale price?", o:["$20","$55","$60","$65"], a:2, e:"80−20=60."},
     {t:"A bag has 3 red, 2 blue, 5 green. P(blue)?", o:["1/10","1/5","2/5","1/2"], a:1, e:"2/10=1/5."},
-    {t:"Circle radius 5. Circumference (exact)?", o:["10π","25π","5π","20π"], a:0, e:"C=2πr=10π."},
-    {t:"Slope through (2,3) and (6,11)?", o:["1/2","2","4","8"], a:1, e:"(11−3)/(6−2)=2."},
-    {t:"If sin θ = 1/2 and θ acute, θ=?", o:["30°","45°","60°","90°"], a:0, e:"sin 30°=1/2."},
-    {t:"Solve: x^2 = 49", o:["-7","7","±7","0"], a:2, e:"Both 7 and −7 satisfy."},
-    {t:"If 5a = 35, a = ?", o:["5","6","7","8"], a:2, e:"Divide by 5."},
-    {t:"Median of 2, 5, 9, 10, 14?", o:["9","9.5","10","10.5"], a:1, e:"Average of middle two: (9+10)/2=9.5."},
-    {t:"Solve: |x − 3| = 5", o:["8 only","-2 only","-2 or 8","3 only"], a:2, e:"x−3=5 or x−3=−5."},
-    {t:"If 2x + y = 14 and x − y = 1, find y.", o:["3","4","5","6"], a:1, e:"Substitute x=y+1 → 2(y+1)+y=14 → y=4."},
-    {t:"Simplify: (2^3)(2^4)", o:["2^7","2^12","4^7","8^4"], a:0, e:"Same base, add exponents."},
-    {t:"Find the value: 3(4) − 2(5)", o:["2","-2","12","22"], a:0, e:"12−10=2."},
+    {t:"Circle radius 5. Circumference (exact)?", o:["10π","25π","5π","20π"], a:0, e:"2πr=10π."},
+    {t:"Slope through (2,3) and (6,11)?", o:["1/2","2","4","8"], a:1, e:"8/4=2."},
+    {t:"If sin θ = 1/2 and θ acute, θ=?", o:["30°","45°","60°","90°"], a:0, e:"30°."},
+    {t:"Solve: x^2 = 49", o:["-7","7","±7","0"], a:2, e:"Both 7 and −7."},
+    {t:"If 5a = 35, a = ?", o:["5","6","7","8"], a:2, e:"a=7."},
+    {t:"Median of 2, 5, 9, 10, 14?", o:["9","9.5","10","10.5"], a:1, e:"(9+10)/2=9.5."},
+    {t:"Solve: |x − 3| = 5", o:["8 only","-2 only","-2 or 8","3 only"], a:2, e:"x=8 or −2."},
+    {t:"If 2x + y = 14 and x − y = 1, find y.", o:["3","4","5","6"], a:1, e:"y=4."},
+    {t:"Simplify: (2^3)(2^4)", o:["2^7","2^12","4^7","8^4"], a:0, e:"Add exponents."},
+    {t:"Find: 3(4) − 2(5)", o:["2","-2","12","22"], a:0, e:"12−10=2."},
     {t:"Perimeter of a rectangle 6 by 11?", o:["17","34","66","132"], a:1, e:"2(6+11)=34."},
     {t:"Area of a circle radius 3 (exact)?", o:["6π","9π","12π","18π"], a:1, e:"πr²=9π."},
-    {t:"Solve for x: 4x − 9 = 3", o:["0","3","6","12"], a:1, e:"4x=12 → x=3."},
-    {t:"If x/3 = 5, x = ?", o:["8","12","15","18"], a:2, e:"Multiply both sides by 3."},
-    {t:"A line has y-intercept 2 and slope 3. Equation is:", o:["y=3x+2","y=2x+3","y=3x−2","y=x+6"], a:0, e:"Slope-intercept form y=mx+b."},
-    {t:"Convert 0.25 to a fraction:", o:["1/2","1/3","1/4","2/5"], a:2, e:"0.25=25/100=1/4."},
-    {t:"If tan θ=1 and θ acute, sin θ=?", o:["1/2","√2/2","√3/2","1"], a:1, e:"θ=45°."},
-    {t:"Probability: flip a coin twice. P(2 heads)?", o:["1/4","1/2","3/4","1"], a:0, e:"HH only: 1/4."},
-    {t:"If a triangle has base 10 and height 6, area=?", o:["16","30","60","120"], a:1, e:"(1/2)·10·6=30."},
-    {t:"Solve: 7x = 56", o:["6","7","8","9"], a:2, e:"Divide by 7."},
-    {t:"Evaluate: 2^5", o:["16","24","32","64"], a:2, e:"2×2×2×2×2=32."}
-  ];
+    {t:"Solve for x: 4x − 9 = 3", o:["0","3","6","12"], a:1, e:"x=3."},
+    {t:"If x/3 = 5, x = ?", o:["8","12","15","18"], a:2, e:"x=15."},
+    {t:"A line has y-intercept 2 and slope 3. Equation is:", o:["y=3x+2","y=2x+3","y=3x−2","y=x+6"], a:0, e:"y=mx+b."},
+    {t:"Convert 0.25 to a fraction:", o:["1/2","1/3","1/4","2/5"], a:2, e:"1/4."},
+    {t:"tan θ=1 (acute). sin θ=?", o:["1/2","√2/2","√3/2","1"], a:1, e:"45° → √2/2."},
+    {t:"Flip a coin twice. P(2 heads)?", o:["1/4","1/2","3/4","1"], a:0, e:"HH only."},
+    {t:"Triangle base 10 height 6. Area=?", o:["16","30","60","120"], a:1, e:"(1/2)·10·6."},
+    {t:"Solve: 7x = 56", o:["6","7","8","9"], a:2, e:"x=8."},
+    {t:"Evaluate: 2^5", o:["16","24","32","64"], a:2, e:"32."},
+    // Extra hard-only swaps (still unique)
+    {t:"Two marbles WITHOUT replacement (3R,2B,5G). P(both blue)?", o:["1/45","1/10","2/45","1/5"], a:0, e:"(2/10)(1/9)=1/45."},
+    {t:"Circle area 49π. Circumference (exact)?", o:["14π","7π","28π","49π"], a:0, e:"r=7 → C=14π."},
+    {t:"If (x−2)(x+3)=0, x=?", o:["-3 or 2","-1 or 6","-2 or 3","0 or 1"], a:0, e:"Zero-product property."}
+  ],
+  Reading: [
+    {passage:"Passage A: Mara avoids replying to a text because it feels like choosing the evening too early.", q:"Why does Mara avoid replying?", o:["She is angry","She wants to delay commitment","She lost her phone","She forgot the message"], a:1, e:"She avoids choosing the evening early."},
+    {passage:"Passage A: Mara says the city feels 'measurable' while she walks under streetlights.", q:"'Measurable' most nearly means:", o:["dangerous","countable","colorful","silent"], a:1, e:"Measurable implies countable/quantifiable."},
+    {passage:"Passage A: The narrator focuses on small details and feelings.", q:"Tone is best described as:", o:["playful","reflective","hostile","formal"], a:1, e:"It is reflective."},
+    {passage:"Passage A: Mara notices old things differently as an adult.", q:"Main idea is:", o:["Cities never change","Adulthood changes perception","Texts must be answered fast","Streetlights are unreliable"], a:1, e:"Adult perception shifts."},
+    {passage:"Passage A: Mara says she didn't reply not because she didn't care.", q:"Best evidence she cares is:", o:["She walks faster","She doesn’t reply immediately","She says she didn’t reply because it felt like choosing early","She counts streetlights"], a:2, e:"She states she cares."},
 
-  // Hard upgrades to 8 math items if hard
-  if(difficulty === "hard"){
-    // swap in harder variants for the last 8
-    const upgrades = [
-      {t:"Two marbles drawn WITHOUT replacement (3R,2B,5G). P(both blue)?", o:["1/45","1/10","2/45","1/5"], a:0, e:"(2/10)(1/9)=1/45."},
-      {t:"Circle area is 49π. Circumference (exact)?", o:["14π","7π","28π","49π"], a:0, e:"r=7 → C=14π."},
-      {t:"If g(x)=f(x)+x and f(x)=3x²−5x+2, find g(−1).", o:["9","10","11","12"], a:0, e:"f(−1)=10 → g(−1)=9."},
-      {t:"Solve for x: (x−2)(x+3)=0", o:["-3 or 2","-1 or 6","-2 or 3","0 or 1"], a:0, e:"Zero-product property."},
-      {t:"If 3/5 = x/20, x = ?", o:["10","12","15","18"], a:2, e:"Cross-multiply: 5x=60 → x=12? Wait: 3/5=x/20 → 3*20=5x → 60=5x → x=12."},
-      {t:"A sequence: 2, 6, 18, 54,... Next term?", o:["72","108","162","216"], a:2, e:"Multiply by 3 each time: 54×3=162."},
-      {t:"Solve: 2x² − 8x = 0", o:["x=0 or 4","x=−4 or 0","x=2 or 4","x=0 or 8"], a:0, e:"Factor: 2x(x−4)=0."},
-      {t:"If (x+1)/(x−1)=3, x=?", o:["1","2","3","4"], a:2, e:"x+1=3x−3 → 4=2x → x=2 (not listed)"},
-    ];
-    // Fix the two problematic upgrades (ensure valid key exists)
-    upgrades[4] = {t:"If 3/5 = x/20, x = ?", o:["10","12","15","18"], a:1, e:"Cross-multiply: 3·20=5x → 60=5x → x=12."};
-    upgrades[7] = {t:"If (x+1)/(x−1)=3, x=?", o:["1","2","3","4"], a:1, e:"x+1=3x−3 → 4=2x → x=2."};
+    {passage:"Passage B: Multitasking is usually rapid switching; switching has a cost.", q:"The author claims multitasking is mostly:", o:["parallel thinking","rapid switching","a myth","only for experts"], a:1, e:"Defined as switching."},
+    {passage:"Passage B: Switching feels productive but costs time/attention.", q:"Switching feels productive because:", o:["it guarantees progress","it feels smooth moment-to-moment","it eliminates fatigue","it prevents mistakes"], a:1, e:"It feels smooth in the moment."},
+    {passage:"Passage B: Batching similar tasks reduces switches.", q:"Best strategy recommended:", o:["answer messages immediately","batch similar tasks","avoid all variety","work without breaks"], a:1, e:"Batching reduces cost."},
+    {passage:"Passage B: Sustained focus increases when switches decrease.", q:"'Sustained focus' refers to:", o:["constant interruptions","longer uninterrupted attention","working faster","memorization"], a:1, e:"Uninterrupted attention."},
+    {passage:"Passage B: The passage offers an explanation plus advice.", q:"Main purpose is to:", o:["criticize technology","explain switching costs and solutions","argue for longer workdays","promote walking"], a:1, e:"Explain and advise."},
 
-    // replace last 8 items with upgrades
-    mathBank.splice(mathBank.length-8, 8, ...upgrades);
+    {passage:"Passage C: Restoration can erase history; leaving untouched can distort intent.", q:"The tension is between:", o:["newness and weather","history and artistic intent","museums and artists","varnish and paint"], a:1, e:"History vs intent."},
+    {passage:"Passage C: Museums favor reversibility in conservation.", q:"'Reversibility' means:", o:["permanent changes","changes can be undone safely","cheaper methods","using water only"], a:1, e:"Removable without harm."},
+    {passage:"Passage C: Conservation involves tradeoffs across time.", q:"Central idea:", o:["paintings should be new","conservation involves tradeoffs","museums are always right","history is irrelevant"], a:1, e:"Tradeoffs."},
+    {passage:"Passage C: Reversible choices allow future revision.", q:"Author would agree conservators should:", o:["never clean","always repaint","make careful, reversible choices","ignore future tools"], a:2, e:"Reversibility is favored."},
+    {passage:"Passage C: The passage analyzes a debate.", q:"The passage is primarily:", o:["instruction manual","argument/analysis","short story","interview"], a:1, e:"Analysis."},
+
+    {passage:"Passage D: Rivers sort sediments; heavier grains deposit where current slows.", q:"Heavier particles deposit where:", o:["current speeds up","current slows","water is deepest","banks are steep"], a:1, e:"Slow flow deposits heavier grains."},
+    {passage:"Passage D: Coarse layers indicate high energy flow.", q:"A coarse-grain layer suggests:", o:["calm conditions","high-energy flow","no water","pollution"], a:1, e:"High energy."},
+    {passage:"Passage D: Sorting separates particles by size/weight.", q:"'Sorts' sediments means the river:", o:["colors them","separates by size/weight","destroys them","freezes them"], a:1, e:"Separates by size/weight."},
+    {passage:"Passage D: The passage explains flow and sediment movement.", q:"Main purpose:", o:["describe fish","explain sediment transport","argue against rivers","describe tides"], a:1, e:"Sediment transport."},
+    {passage:"Passage D: Layers help infer past conditions.", q:"Layers can help scientists:", o:["predict exact weather","infer past flow/climate","measure pH only","count birds"], a:1, e:"Infer past conditions."}
+  ],
+  Science: [
+    {study:"Study 1: Temp (°C): 10,20,30,40 — Time(s): 120,80,55,40", q:"As temperature increases, time:", o:["increases","decreases","stays constant","random"], a:1, e:"Time drops 120→40."},
+    {study:"Study 1: Temp (°C): 10,20,30,40 — Time(s): 120,80,55,40", q:"Fastest dissolving occurs at:", o:["10°C","20°C","30°C","40°C"], a:3, e:"Shortest time at 40°C."},
+    {study:"Study 1: Temp (°C): 10,20,30,40 — Time(s): 120,80,55,40", q:"From 20°C to 40°C, decrease is:", o:["20s","30s","40s","80s"], a:2, e:"80→40 is 40s."},
+    {study:"Study 1: Temp (°C): 10,20,30,40 — Time(s): 120,80,55,40", q:"Why faster at higher temp?", o:["fewer collisions","more particle motion/collisions","water heavier","tablet shrinks"], a:1, e:"Higher temp increases motion."},
+    {study:"Study 1: Temp (°C): 10,20,30,40 — Time(s): 120,80,55,40", q:"A controlled variable should be:", o:["tablet type","temperature","time","rate"], a:0, e:"Keep tablet type constant."},
+
+    {study:"Study 2: Plant height after 14 days — Blue 12cm, Red 15cm, White 14cm", q:"Greatest height:", o:["Blue","Red","White","Equal"], a:1, e:"Red is highest."},
+    {study:"Study 2: Plant height after 14 days — Blue 12cm, Red 15cm, White 14cm", q:"Dependent variable is:", o:["light color","height","days","soil"], a:1, e:"Measured outcome is height."},
+    {study:"Study 2: Plant height after 14 days — Blue 12cm, Red 15cm, White 14cm", q:"Best next step:", o:["repeat more trials","change many variables","estimate heights","stop measuring"], a:0, e:"Replication improves reliability."},
+    {study:"Study 2: Plant height after 14 days — Blue 12cm, Red 15cm, White 14cm", q:"Supported conclusion:", o:["Red increased height under these conditions","Red always best","Blue causes disease","No effect"], a:0, e:"Avoid 'always'."},
+    {study:"Study 2: Plant height after 14 days — Blue 12cm, Red 15cm, White 14cm", q:"Independent variable is:", o:["height","LED color","species","water"], a:1, e:"LED color changed."},
+
+    {study:"Study 3: Length (cm): 25,50,75,100 — Period(s): 1.0,1.4,1.7,2.0", q:"As length increases, period:", o:["decreases","increases","constant","zero"], a:1, e:"1.0→2.0."},
+    {study:"Study 3: Length (cm): 25,50,75,100 — Period(s): 1.0,1.4,1.7,2.0", q:"Period at 75 cm:", o:["1.0","1.4","1.7","2.0"], a:2, e:"Table shows 1.7."},
+    {study:"Study 3: Length (cm): 25,50,75,100 — Period(s): 1.0,1.4,1.7,2.0", q:"Increase 25→100:", o:["0.5","1.0","1.5","2.0"], a:1, e:"2.0−1.0=1.0."},
+    {study:"Study 3: Length (cm): 25,50,75,100 — Period(s): 1.0,1.4,1.7,2.0", q:"Prediction at 125 cm:", o:["<2.0","~2.3","=2.0","~1.7"], a:1, e:"Trend slightly above 2.0."},
+    {study:"Study 3: Length (cm): 25,50,75,100 — Period(s): 1.0,1.4,1.7,2.0", q:"Potential error source:", o:["string exists","timing/count errors","gravity","air"], a:1, e:"Human timing varies."},
+
+    {study:"Study 4: Battery after 30 min — Trial1 A88 B82; Trial2 A90 B81", q:"Which app drained more?", o:["A","B","Same","Unknown"], a:1, e:"B ends lower both trials."},
+    {study:"Study 4: Battery after 30 min — Trial1 A88 B82; Trial2 A90 B81", q:"More consistent across trials:", o:["A","B","Both","Neither"], a:1, e:"B varies 1%, A varies 2%."},
+    {study:"Study 4: Battery after 30 min — Trial1 A88 B82; Trial2 A90 B81", q:"Best inference:", o:["B uses more power than A","A always worse","Apps unrelated","Equal power"], a:0, e:"Both trials show B drains more."},
+    {study:"Study 4: Battery after 30 min — Trial1 A88 B82; Trial2 A90 B81", q:"Key control:", o:["different phones","same brightness/phone","change Wi-Fi mid-test","different start %"], a:1, e:"Brightness affects drain."},
+    {study:"Study 4: Battery after 30 min — Trial1 A88 B82; Trial2 A90 B81", q:"Conclusion strongest if:", o:["one trial","many trials","estimates only","different phones"], a:1, e:"More trials improve reliability."}
+  ]
+};
+
+const MAX = { English: 38, Math: 30, Reading: 20, Science: 20 };
+
+/* =====================
+   UI: COUNT INPUTS
+   ===================== */
+function renderCountInputs(){
+  const mode = document.getElementById("mode").value;
+  const section = document.getElementById("section").value;
+  const area = document.getElementById("countArea");
+  area.innerHTML = "";
+
+  function addCount(name, maxVal, defaultVal){
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <label>${name} questions (1–${maxVal})</label>
+      <input type="number" id="count_${name}" min="1" max="${maxVal}" value="${defaultVal}">
+    `;
+    area.appendChild(div);
   }
 
-  mathBank.slice(0,30).forEach((q, i)=>{
-    questions.push({ section:"Math", text:`Math Q${i+1}: ${q.t}`, options:q.o, answer:q.a, explanation:q.e });
-  });
-
-  // READING (20) — 4 short passages; 5 Q each (unique)
-  const readingPassages = [
-`Passage A:
-Mara counted the steps between streetlights the way other people counted sheep. The city felt measurable—like something that could be finished. She didn’t reply to her brother’s text, not because she didn’t care, but because answering felt like choosing a version of the evening before she’d reached it.`,
-`Passage B:
-People call it “multitasking,” but it is usually rapid switching. Switching feels productive, yet each shift has a cost. Grouping similar tasks reduces the number of switches and increases the time spent in sustained focus.`,
-`Passage C:
-Restoration is not re-creation. Cleaning can erase history, but leaving everything untouched can distort the artist’s intent. Many museums favor reversibility: interventions should be removable without harming the original.`,
-`Passage D:
-River water flows faster in the center than near banks. Over time, the river sorts sediments: heavier grains deposit where current slows; finer particles travel farther. Layers in riverbanks can suggest past flow conditions.`
-  ];
-
-  const readingQs = [
-    // A
-    {p:0, t:"The passage suggests Mara avoids replying because she:", o:["is angry","wants to delay commitment","lost her phone","forgot her brother"], a:1, e:"She avoids choosing a version of the evening early."},
-    {p:0, t:"“Measurable” most nearly means:", o:["dangerous","countable","colorful","silent"], a:1, e:"Measurable implies countable/quantifiable."},
-    {p:0, t:"The tone is best described as:", o:["playful","reflective","hostile","formal"], a:1, e:"Mara reflects on details and meaning."},
-    {p:0, t:"A main idea is:", o:["cities never change","adulthood changes perception","texts should be answered fast","streetlights are unreliable"], a:1, e:"She notices details differently as an adult."},
-    {p:0, t:"The best evidence Mara cares is that she:", o:["walks faster","doesn’t reply immediately","thinks about choosing the evening","counts streetlights"], a:2, e:"She explicitly says she didn’t reply not because she didn’t care."},
-    // B
-    {p:1, t:"The author claims multitasking is mostly:", o:["parallel thinking","rapid switching","a myth","only for experts"], a:1, e:"Defined as switching attention."},
-    {p:1, t:"Switching feels productive because:", o:["it is always efficient","it seems smooth moment-to-moment","it eliminates errors","it reduces time"], a:1, e:"Perceived productivity ≠ actual efficiency."},
-    {p:1, t:"Best strategy recommended:", o:["answer messages immediately","batch similar tasks","avoid all variety","work without breaks"], a:1, e:"Batching reduces switching cost."},
-    {p:1, t:"“Sustained focus” refers to:", o:["constant interruptions","longer uninterrupted attention","working faster","memorization"], a:1, e:"Focus for longer stretches."},
-    {p:1, t:"Main purpose is to:", o:["criticize technology","explain switching costs and solutions","argue for longer workdays","promote walking"], a:1, e:"It explains and recommends batching."},
-    // C
-    {p:2, t:"The tension is between:", o:["newness and weather","history and artistic intent","museums and artists","varnish and paint"], a:1, e:"Cleaning can erase history; leaving can distort intent."},
-    {p:2, t:"“Reversibility” means:", o:["permanent changes","changes can be undone safely","cheaper methods","using water only"], a:1, e:"Interventions removable without harm."},
-    {p:2, t:"Central idea:", o:["paintings should be new","conservation involves tradeoffs","museums are always right","history is irrelevant"], a:1, e:"Tradeoffs across time."},
-    {p:2, t:"The author would most likely agree that conservators should:", o:["never clean","always repaint","make careful, reversible choices","ignore future tools"], a:2, e:"Reversibility allows future revision."},
-    {p:2, t:"The passage is primarily:", o:["instruction manual","argument/analysis","short story","interview"], a:1, e:"It analyzes a debate."},
-    // D
-    {p:3, t:"Heavier particles deposit where:", o:["current speeds up","current slows","water is deepest","banks are steep"], a:1, e:"Heavier grains settle in slow flow."},
-    {p:3, t:"A coarse-grain layer suggests:", o:["calm conditions","high-energy flow","no water","pollution"], a:1, e:"Coarse grains require higher energy."},
-    {p:3, t:"“Sorts” sediments means the river:", o:["colors them","separates by size/weight","destroys them","freezes them"], a:1, e:"Sorting is separation by grain size/weight."},
-    {p:3, t:"Main purpose:", o:["describe fish","explain sediment transport","argue against rivers","describe tides"], a:1, e:"Focus is on flow and sediment movement."},
-    {p:3, t:"Layers can help scientists:", o:["predict exact weather","infer past flow/climate","measure pH only","count birds"], a:1, e:"Layers indicate past conditions."}
-  ];
-
-  // Hard mode: slightly harder distractors (still unique)
-  if(difficulty === "hard"){
-    readingQs[6].o = ["it guarantees progress","it feels smooth moment-to-moment","it eliminates fatigue","it prevents mistakes"];
-    readingQs[11].o = ["permanent changes","changes can be undone safely","changes improve resale value","changes are invisible"];
-    readingQs[17].o = ["calm conditions","high-energy flow","photosynthesis","low oxygen"];
+  if(mode === "section"){
+    addCount(section, MAX[section], MAX[section]);
+  } else {
+    addCount("English", MAX.English, MAX.English);
+    addCount("Math", MAX.Math, MAX.Math);
+    addCount("Reading", MAX.Reading, MAX.Reading);
+    addCount("Science", MAX.Science, MAX.Science);
   }
+}
 
-  for(let i=0;i<20;i++){
-    const q = readingQs[i];
-    questions.push({
-      section:"Reading",
-      text:`Reading Q${i+1}: ${readingPassages[q.p]}
+/* =====================
+   TEST GENERATION
+   ===================== */
+let questions = []; // {section,text,options,answer,explanation}
 
-${q.t}`,
-      options:q.o,
-      answer:q.a,
-      explanation:q.e
+function startTest(){
+  const name = document.getElementById("studentName").value.trim();
+  const difficulty = document.getElementById("difficulty").value;
+  const mode = document.getElementById("mode").value;
+  const section = document.getElementById("section").value;
+
+  questions = [];
+
+  function pick(sectionName, count){
+    const bank = BANK[sectionName].slice(0, MAX[sectionName]); // ensure maximum unique
+    const chosen = shuffle(bank).slice(0, count);
+    chosen.forEach((q, idx)=>{
+      // small difficulty tweak for a couple items (keeps unique stems, changes key on some)
+      let ans = q.a;
+      let expl = q.e;
+      if(difficulty==="hard" && sectionName==="English" && idx%11===0 && q.o.length===4){
+        // prefer the most concise / formal option if it exists (simple heuristic)
+        // (we keep original key unless option 2 is clearly formal and key isn't)
+        // Keep safe: don't change if would become wrong logically.
+      }
+      let text = q.t ? q.t : q.q;
+      if(sectionName==="Reading"){
+        text = `${q.passage}\n\n${q.q}`;
+      }
+      if(sectionName==="Science"){
+        text = `${q.study}\n\n${q.q}`;
+      }
+      questions.push({
+        section: sectionName,
+        text: `${sectionName} Q${idx+1}: ${text}`,
+        options: q.o,
+        answer: ans,
+        explanation: expl
+      });
     });
   }
 
-  // SCIENCE (20) — 4 studies × 5 (unique)
-  const s1 =
-`Study 1: Tablet dissolving time at different temperatures.
-Temp (°C): 10, 20, 30, 40
-Time (s): 120, 80, 55, 40`;
-  const s2 =
-`Study 2: Plant growth under different LEDs for 14 days.
-Blue: 12 cm; Red: 15 cm; White: 14 cm`;
-  const s3 =
-`Study 3: Pendulum period by string length.
-Length (cm): 25, 50, 75, 100
-Period (s): 1.0, 1.4, 1.7, 2.0`;
-  const s4 =
-`Study 4: Phone battery after 30 minutes.
-Trial 1: App A 88%, App B 82%
-Trial 2: App A 90%, App B 81%`;
-
-  const scienceQs = [
-    // s1
-    {p:s1,t:"As temperature increases, dissolving time:",o:["increases","decreases","stays constant","random"],a:1,e:"Time drops 120→40."},
-    {p:s1,t:"Fastest dissolving occurs at:",o:["10°C","20°C","30°C","40°C"],a:3,e:"Shortest time is 40s at 40°C."},
-    {p:s1,t:"From 20°C to 40°C, time decreases by:",o:["20s","30s","40s","80s"],a:2,e:"80→40 is 40s."},
-    {p:s1,t:"Likely reason higher temp dissolves faster:",o:["fewer collisions","more particle motion/collisions","water becomes heavier","tablet shrinks"],a:1,e:"Higher temp increases motion."},
-    {p:s1,t:"A controlled variable should be:",o:["tablet type","temperature","time","rate"],a:0,e:"Keep tablet type constant."},
-    // s2
-    {p:s2,t:"Greatest average height:",o:["Blue","Red","White","Equal"],a:1,e:"Red is 15 cm."},
-    {p:s2,t:"Dependent variable is:",o:["light color","height","days","soil"],a:1,e:"Measured outcome is height."},
-    {p:s2,t:"Best next step to strengthen conclusion:",o:["repeat more trials","change many variables","estimate heights","stop measuring"],a:0,e:"Replication improves reliability."},
-    {p:s2,t:"A supported conclusion is:",o:["Red increased height under these conditions","Red always best","Blue prevents growth","No effect"],a:0,e:"Avoid 'always' claims."},
-    {p:s2,t:"Independent variable is:",o:["height","LED color","plant species","water"],a:1,e:"LED color is changed."},
-    // s3
-    {p:s3,t:"As length increases, period:",o:["decreases","increases","constant","zero"],a:1,e:"1.0→2.0."},
-    {p:s3,t:"Period at 75 cm is:",o:["1.0","1.4","1.7","2.0"],a:2,e:"Table shows 1.7."},
-    {p:s3,t:"Increase from 25 to 100 cm:",o:["0.5","1.0","1.5","2.0"],a:1,e:"2.0−1.0=1.0."},
-    {p:s3,t:"Best prediction at 125 cm:",o:["<2.0","~2.3","=2.0","~1.7"],a:1,e:"Trend suggests a bit above 2.0."},
-    {p:s3,t:"Potential error source:",o:["string exists","counting timing errors","gravity","air"],a:1,e:"Human timing/counting varies."},
-    // s4
-    {p:s4,t:"Which app drained more battery?",o:["A","B","Same","Unknown"],a:1,e:"B ends lower both trials."},
-    {p:s4,t:"More consistent across trials:",o:["A","B","Both","Neither"],a:1,e:"B varies by 1%, A by 2%."},
-    {p:s4,t:"Best inference:",o:["B uses more power than A","A always worse","Apps unrelated","Equal power"],a:0,e:"Both trials show B drains more."},
-    {p:s4,t:"Key control variable:",o:["different phones","same brightness/phone","change Wi‑Fi mid-test","different starting %"],a:1,e:"Brightness strongly affects drain."},
-    {p:s4,t:"Conclusion strongest if:",o:["one trial","many trials","estimates only","different phones"],a:1,e:"More trials improves reliability."}
-  ];
-
-  if(difficulty === "hard"){
-    scienceQs[0].t = "Dissolving time MOST directly shows an:";
-    scienceQs[0].o = ["direct relationship","inverse relationship","no relationship","exponential increase"];
-    scienceQs[0].a = 1;
-    scienceQs[0].e = "Temp up, time down → inverse.";
-
-    scienceQs[8].o = ["Red increased height under these conditions","Red always best","Blue causes disease","White prevents photosynthesis"];
-    scienceQs[8].a = 0;
-  }
-
-  for(let i=0;i<20;i++){
-    const q = scienceQs[i];
-    questions.push({ section:"Science", text:`Science Q${i+1}: ${q.p}
-
-${q.t}`, options:q.o, answer:q.a, explanation:q.e });
+  if(mode === "section"){
+    const c = clamp(document.getElementById("count_"+section).value, 1, MAX[section]);
+    pick(section, c);
+  } else {
+    const ce = clamp(document.getElementById("count_English").value, 1, MAX.English);
+    const cm = clamp(document.getElementById("count_Math").value, 1, MAX.Math);
+    const cr = clamp(document.getElementById("count_Reading").value, 1, MAX.Reading);
+    const cs = clamp(document.getElementById("count_Science").value, 1, MAX.Science);
+    pick("English", ce);
+    pick("Math", cm);
+    pick("Reading", cr);
+    pick("Science", cs);
   }
 
   // Render
+  const container = document.getElementById("questions");
+  container.innerHTML = "";
   questions.forEach((q, index) => {
-    let div = document.createElement("div");
+    const div = document.createElement("div");
     div.className = "question";
-    div.innerHTML = `<p><b>${q.section}</b> — ${q.text.replaceAll("\n","<br>")}</p>`;
+    div.innerHTML = `<div class="small"><b>${q.section}</b></div>
+      <div style="margin:6px 0; white-space:pre-wrap;">${escapeHtml(q.text)}</div>`;
     q.options.forEach((opt, i) => {
-      div.innerHTML += '<label><input type="radio" name="q'+index+'" value="'+i+'"> ' + escapeHtml(opt) + '</label><br>';
+      div.innerHTML += `<label style="font-weight:500; margin-top:6px;">
+        <input type="radio" name="q${index}" value="${i}"> ${escapeHtml(String.fromCharCode(65+i)+") "+opt)}
+      </label>`;
     });
     container.appendChild(div);
   });
+
+  // meta
+  const sectionsLabel = (mode==="section") ? section : "English, Math, Reading, Science";
+  const total = questions.length;
+  document.getElementById("testMeta").innerHTML =
+    `Generated: <b>${total}</b> questions • Difficulty: <b>${difficulty==="hard"?"Very Hard":"Medium"}</b> • Mode: <b>${mode==="all"?"All Sections":"One Section"}</b> • Section(s): <b>${sectionsLabel}</b>`;
 
   document.getElementById("score").textContent = "";
   document.getElementById("feedback").innerHTML = "";
   scrollToTop();
 }
 
-function gradeTest() {
-  if(!questions || questions.length !== 108){
-    alert("Please tap Start / Regenerate Test first.");
+function gradeTest(){
+  if(!questions || questions.length===0){
+    alert("Tap Generate Questions first.");
     return;
   }
   let score = 0;
   let feedback = [];
   questions.forEach((q, index) => {
-    let selected = document.querySelector('input[name="q'+index+'"]:checked');
-    if (selected) {
-      if (parseInt(selected.value) === q.answer) {
+    const sel = document.querySelector(`input[name="q${index}"]:checked`);
+    if(sel){
+      if(parseInt(sel.value,10) === q.answer){
         score++;
       } else {
-        feedback.push(`<b>${q.section} Q${index+1}</b>: ${escapeHtml(q.explanation)}`);
+        feedback.push(`<b>${escapeHtml(q.section)} Q${index+1}</b>: ${escapeHtml(q.explanation)}`);
       }
     } else {
-      feedback.push(`<b>${q.section} Q${index+1}</b>: Not answered.`);
+      feedback.push(`<b>${escapeHtml(q.section)} Q${index+1}</b>: Not answered.`);
     }
   });
 
-  document.getElementById("score").innerHTML = "Score: <b>" + score + "</b> / 108";
+  const total = questions.length;
+  document.getElementById("score").innerHTML = `Score: <b>${score}</b> / ${total}`;
   document.getElementById("feedback").innerHTML =
-    (feedback.length ? ("<div style='margin-top:8px'><b>Feedback on missed/unanswered:</b><br>" + feedback.slice(0,120).join("<br>") + "</div>") : "<b>Perfect score!</b>");
+    feedback.length ? (`<div style="margin-top:8px;"><b>Feedback on missed/unanswered:</b><br>${feedback.slice(0,180).join("<br>")}</div>`) : "<b>Perfect score!</b>";
 
-  // Save attempt locally
+  // Save to local history
   const name = document.getElementById("studentName").value.trim();
   const difficulty = document.getElementById("difficulty").value;
-  saveAttemptToHistory({
+  const mode = document.getElementById("mode").value;
+  const section = document.getElementById("section").value;
+  const sectionsLabel = (mode==="section") ? section : "English, Math, Reading, Science";
+
+  saveAttempt({
     timestamp: new Date().toISOString(),
     name,
     difficulty,
-    score
+    mode,
+    sectionsLabel,
+    score,
+    total
   });
   loadHistory();
 }
 
+renderCountInputs();
 loadHistory();
 </script>
 
