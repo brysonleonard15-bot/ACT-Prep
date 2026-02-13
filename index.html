@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ACT Half-Length Practice (Medium + Very Hard)</title>
+  <style>
+    :root{
+      --bg:#f4f6f8; --card:#fff; --ink:#17212b; --muted:#5b6775; --brand:#1a73e8;
+      --good:#0b7; --bad:#d33; --warn:#f59e0b; --border:#e6eaf0;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    header{position:sticky;top:0;background:#0f1f33;color:#fff;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);z-index:10}
+    header .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    header h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px}
+    header .pill{padding:6px 10px;border:1px solid rgba(255,255,255,.25);border-radius:999px;font-size:12px;color:#fff;opacity:.95}
+    header select, header button{
+      background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2);
+      padding:8px 10px; border-radius:8px; font-weight:600; cursor:pointer
+    }
+    header button:hover{background:rgba(255,255,255,.16)}
+    main{max-width:1100px;margin:18px auto;padding:0 14px 28px}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+    .card h2{margin:0 0 8px;font-size:15px}
+    .muted{color:var(--muted)}
+    .btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .btn2{background:#eef4ff;color:#0c3e96;border:1px solid #d6e6ff;border-radius:10px;padding:9px 12px;font-weight:800;cursor:pointer}
+    .btn3{background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-weight:800;cursor:pointer}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .spacer{flex:1}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .box{flex:1;min-width:160px;border:1px solid var(--border);border-radius:10px;padding:10px}
+    .kpi .box b{font-size:18px}
+    .bar{height:10px;background:#ecf0f6;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+    .bar > div{height:100%;background:var(--brand);width:0%}
+    .qhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}
+    .qnum{font-weight:900}
+    .tag{font-size:12px;border:1px solid var(--border);padding:3px 8px;border-radius:999px;color:var(--muted)}
+    .prompt{white-space:pre-wrap}
+    .choices{display:grid;gap:8px;margin-top:10px}
+    label.choice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);padding:10px;border-radius:10px;cursor:pointer}
+    label.choice:hover{border-color:#c8d7f8;background:#f7faff}
+    input[type=radio]{margin-top:2px}
+    .nav{display:flex;gap:10px;flex-wrap:wrap}
+    .mini{font-size:12px}
+    .warn{color:var(--warn);font-weight:800}
+    .good{color:var(--good);font-weight:800}
+    .bad{color:var(--bad);font-weight:800}
+    .list{margin:0;padding-left:18px}
+    .hr{height:1px;background:var(--border);margin:12px 0}
+    details summary{cursor:pointer;font-weight:800}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}
+    .table{width:100%;border-collapse:collapse;font-size:13px}
+    .table th,.table td{border:1px solid var(--border);padding:8px;text-align:left;vertical-align:top}
+    .right{text-align:right}
+    .center{text-align:center}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <h1>ACT Half-Length Practice (Medium + Very Hard)</h1>
+    <span class="pill" id="statusPill">Not started</span>
+    <span class="pill">English 38 • Math 30 • Reading 20 • Science 20</span>
+    <div class="spacer"></div>
+    <select id="difficultySel" title="Difficulty">
+      <option value="medium">Medium</option>
+      <option value="hard">Very Hard</option>
+    </select>
+    <button id="resetBtn" title="Reset everything">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <div class="card">
+      <div class="row">
+        <div>
+          <h2 id="sectionTitle">Setup</h2>
+          <div class="muted" id="sectionDesc">Choose difficulty, then start. Timers match half-length ACT pacing.</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button class="btn" id="startBtn">Start</button>
+          <button class="btn2" id="pauseBtn" disabled>Pause</button>
+          <button class="btn3" id="resumeBtn" disabled>Resume</button>
+          <button class="btn3" id="finishBtn" disabled>Finish & Grade</button>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="kpi">
+        <div class="box">
+          <div class="muted mini">Section</div>
+          <b id="kpiSection">—</b>
+          <div class="muted mini" id="kpiPacing">—</div>
+        </div>
+        <div class="box">
+          <div class="muted mini">Time remaining</div>
+          <b id="kpiTime">—</b>
+          <div class="muted mini" id="kpiTotalTime">—</div>
+        </div>
+        <div class="box">
+          <div class="muted mini">Progress</div>
+          <b id="kpiProgress">—</b>
+          <div class="bar"><div id="progressBar"></div></div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div id="questionArea" class="hidden">
+        <div class="qhead">
+          <div class="qnum" id="qNum">Q—</div>
+          <span class="tag" id="qSkill">—</span>
+          <span class="tag" id="qDiff">—</span>
+          <div class="spacer"></div>
+          <button class="btn3 mini" id="flagBtn">Flag</button>
+        </div>
+        <div class="prompt" id="qPrompt"></div>
+        <div class="choices" id="qChoices"></div>
+
+        <div class="hr"></div>
+
+        <div class="nav">
+          <button class="btn3" id="prevBtn">◀ Prev</button>
+          <button class="btn3" id="nextBtn">Next ▶</button>
+          <button class="btn2" id="toSectionBtn">Next Section</button>
+        </div>
+        <div class="muted mini" id="navHint"></div>
+      </div>
+
+      <div id="resultsArea" class="hidden">
+        <h2>Results</h2>
+        <div class="kpi">
+          <div class="box"><div class="muted mini">Total Raw Score</div><b id="rawTotal">—</b><div class="muted mini">out of 108</div></div>
+          <div class="box"><div class="muted mini">Estimated Composite</div><b id="estComposite">—</b><div class="muted mini">(rough estimate)</div></div>
+          <div class="box"><div class="muted mini">Attempt saved</div><b id="savedOk">—</b><div class="muted mini">local browser history</div></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <table class="table">
+          <thead><tr><th>Section</th><th class="center">Raw</th><th class="center">%</th><th>Feedback Focus</th></tr></thead>
+          <tbody id="sectionTable"></tbody>
+        </table>
+
+        <div class="hr"></div>
+
+        <details open>
+          <summary>Question-by-question review (with explanations)</summary>
+          <div id="reviewList"></div>
+        </details>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <button class="btn2" id="printBtn">Print / Save PDF</button>
+          <button class="btn3" id="exportBtn">Export Attempt JSON</button>
+          <div class="spacer"></div>
+          <button class="btn" id="restartBtn">Start New Attempt</button>
+        </div>
+        <pre class="mono hidden" id="exportOut"></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Attempt History (this device)</h2>
+      <div class="muted mini">Saved locally in your browser. Share the HTML file for others to use; their results stay on their device unless you add a server later.</div>
+      <div class="hr"></div>
+      <div id="history"></div>
+      <div class="hr"></div>
+      <h2>How grading + feedback works</h2>
+      <ul class="list">
+        <li><b>Auto-grade</b>: compares selected option to the key.</li>
+        <li><b>Explanations</b>: each question includes “why” feedback.</li>
+        <li><b>Skill tags</b>: points you to what to practice next.</li>
+        <li><b>Very Hard</b> mode: more multi-step reasoning + trickier distractors.</li>
+      </ul>
+      <div class="hr"></div>
+      <h2>Timers (half-length pacing)</h2>
+      <ul class="list">
+        <li>English: <b>22:30</b></li>
+        <li>Math: <b>30:00</b></li>
+        <li>Reading: <b>17:30</b></li>
+        <li>Science: <b>17:30</b></li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ===========================
+   DATA: QUESTION BANK
+   - Original questions (not official ACT content)
+   - Two difficulty sets: medium vs hard
+   - Half-length counts: E38 / M30 / R20 / S20
+   =========================== */
+
+const SECTION_ORDER = ["English","Math","Reading","Science"];
+const SECTION_LIMITS = { English:38, Math:30, Reading:20, Science:20 };
+const SECTION_TIMES_SEC = { English: 22*60+30, Math: 30*60, Reading: 17*60+30, Science: 17*60+30 };
+
+function mkQ(section, skill, diff, prompt, choices, answerIndex, explanation){
+  return { section, skill, diff, prompt, choices, answerIndex, explanation };
+}
+
+// Helper: generate many English items from patterns
+function buildEnglish(diff){
+  const hard = (diff==="hard");
+  const qs = [];
+  const items = [
+    ["Grammar: subject-verb agreement", "The team, along with its coach, ___ leaving tomorrow.", ["is","are","were","be"], 0,
+      "The subject is 'team' (singular). The phrase 'along with its coach' is parenthetical; it does not change the verb."],
+    ["Punctuation: semicolon", "I finished my homework ___ I watched a movie.", ["and","but",";","or"], 2,
+      "A semicolon correctly joins two closely related independent clauses."],
+    ["Pronoun clarity", "When Jordan texted Alex after the meeting, ___ sounded relieved.", ["he","they","Jordan","it"], hard?3:0,
+      hard ? "In hard mode, the sentence is ambiguous; 'it' (the message/tone) is the clearest fix among these." :
+             "If the intended antecedent is Jordan (subject), 'he' fits; ACT often tests choosing the clearest pronoun."],
+    ["Word choice", "The scientist was ___ by the unexpected result.", ["elated","alluded","eroded","assented"], 0,
+      "'Elated' means very happy. The other options do not match the context."],
+    ["Comma splice", "The forecast changed quickly, we decided to leave early.", ["forecast changed quickly; we decided","forecast changed quickly we decided","forecast changed quickly, and we decided","forecast changed quickly, however we decided"], 2,
+      "A comma splice is fixed by adding a coordinating conjunction ('and') or using a semicolon."],
+    ["Modifier placement", "Walking into the shop, the smell of fresh bread ___ .", ["made me hungry","were delicious","hunger rose","hung in the air"], 3,
+      "The opening modifier should describe the person walking. 'hung in the air' avoids mis-modifying 'smell' as the walker."],
+    ["Parallel structure", "She likes hiking, to swim, and ___ .", ["to bike","biking","bike","to be biking"], 0,
+      "Keep parallel form: 'hiking' is a gerund, but the list includes 'to swim'. Best fix is to make all infinitives: 'to bike'."],
+    ["Apostrophes", "Both of the ___ jerseys were missing.", ["players","player's","players'","players's"], 2,
+      "Plural possessive: players' jerseys."],
+    ["Conciseness", "Due to the fact that it was raining, we stayed inside.", ["Because it was raining, we stayed inside.","Because of rain, we stayed inside.","It was raining, we stayed inside.","A and B"], 3,
+      "Both A and B improve concision and clarity without changing meaning."],
+    ["Rhetoric: best transition", "The first prototype failed repeatedly. ___, the team learned which tolerances mattered most.", ["For example","Nevertheless","Meanwhile","Initially"], 1,
+      "'Nevertheless' signals contrast: failure still produced learning."]
+  ];
+
+  let i=0;
+  while(qs.length<38){
+    const base = items[i%items.length];
+    const [skill, stem, choices, ans, expl] = base;
+    const n = qs.length+1;
+    const prompt = `${stem}\n\nChoose the best option.`;
+    let answerIndex = ans;
+
+    // Hard mode tweaks: subtle shifts
+    if(hard && (n%5===0)){
+      if(skill.includes("Conciseness")) answerIndex = 0; // pick best concise
+      if(skill.includes("Parallel")) answerIndex = 1; // prefer gerund parallel in this variant
+    }
+
+    const diffLabel = hard ? "Very Hard" : "Medium";
+    const prompt2 = hard && (n%3===0)
+      ? prompt.replace("Choose the best option.","Choose the option that is most clear and grammatically correct.")
+      : prompt;
+
+    qs.push(mkQ("English", skill, diffLabel, `(${n}) ${prompt2}`, choices, answerIndex, expl));
+    i++;
+  }
+  return qs;
+}
+
+// Math: 30 multiple-choice
+function buildMath(diff){
+  const hard = (diff==="hard");
+  const qs = [];
+  const diffLabel = hard ? "Very Hard" : "Medium";
+
+  const bank = [
+    ["Algebra: linear equations", "Solve for x: 2x + 5 = 17", ["6","7","11","12"], 0,
+      "Subtract 5: 2x=12. Divide by 2: x=6."],
+    ["Algebra: systems", "If x+y=11 and x−y=3, what is x?", ["4","7","8","14"], 1,
+      "Add equations: 2x=14 → x=7."],
+    ["Geometry: area", "A right triangle has legs 6 and 8. Area = ?", ["14","24","48","96"], 1,
+      "Area = (1/2)ab = (1/2)(6)(8)=24."],
+    ["Exponent rules", "Simplify: (x^3)(x^5)", ["x^8","x^15","x^2","8x"], 0,
+      "Add exponents: 3+5=8."],
+    ["Functions", "If f(x)=3x²−5x+2, find f(−1).", ["0","4","10","12"], 2,
+      "f(−1)=3(1)−5(−1)+2=3+5+2=10."],
+    ["Percent", "A $80 item is discounted 25%. Sale price?", ["$20","$55","$60","$65"], 2,
+      "25% of 80 is 20; 80−20=60."],
+    ["Probability", "A bag has 3 red, 2 blue, 5 green. P(blue)?", ["1/10","1/5","2/5","1/2"], 1,
+      "Total 10. Blue 2 → 2/10=1/5."],
+    ["Geometry: circle", "Circle radius 5. Circumference (exact)?", ["10π","25π","5π","20π"], 0,
+      "C=2πr=2π(5)=10π."],
+    ["Coordinate geometry", "Slope through (2,3) and (6,11)?", ["1/2","2","4","8"], 1,
+      "Slope = (11−3)/(6−2)=8/4=2."],
+    ["Trig basics", "If sin θ = 1/2 and θ is acute, θ=?", ["30°","45°","60°","90°"], 0,
+      "sin 30°=1/2."],
+  ];
+
+  let i=0;
+  while(qs.length<30){
+    const b = bank[i%bank.length];
+    const [skill, stem, choices, ans, expl] = b;
+    const n = qs.length+1;
+
+    let prompt = stem;
+    let c = [...choices];
+    let a = ans;
+    let e = expl;
+
+    if(hard && n%4===0){
+      if(skill.includes("Probability")){
+        prompt = "A bag has 3 red, 2 blue, 5 green. Two marbles are drawn WITHOUT replacement. P(both blue)?";
+        c = ["1/45","1/10","2/45","1/5"];
+        a = 0; // (2/10)*(1/9)=1/45
+        e = "Without replacement: (2/10)·(1/9)=2/90=1/45.";
+      } else if(skill.includes("Circle")){
+        prompt = "A circle has area 49π. What is its circumference (exact)?";
+        c = ["14π","7π","28π","49π"];
+        a = 0;
+        e = "Area πr²=49π → r²=49 → r=7. Circumference 2πr=14π.";
+      } else if(skill.includes("Functions")){
+        prompt = "If f(x)=3x²−5x+2 and g(x)=f(x)+x, what is g(−1)?";
+        c = ["9","10","11","12"];
+        a = 0;
+        e = "Compute f(−1)=10, then g(−1)=f(−1)+(−1)=9.";
+      } else if(skill.includes("Systems")){
+        prompt = "If 2x+y=14 and x−y=1, what is y?";
+        c = ["3","4","5","6"];
+        a = 1; // 4
+        e = "From x−y=1 → x=y+1. Substitute: 2(y+1)+y=14 → 3y=12 → y=4.";
+      } else if(skill.includes("Trig")){
+        prompt = "If tan θ = 1 and θ is acute, what is sin θ?";
+        c = ["1/2","√2/2","√3/2","1"];
+        a = 1;
+        e = "tan θ=1 for acute θ at 45°. sin 45° = √2/2.";
+      }
+    }
+
+    qs.push(mkQ("Math", skill, diffLabel, `(${n}) ${prompt}`, c, a, e));
+    i++;
+  }
+  return qs;
+}
+
+// Reading: 4 passages × 5 questions = 20
+function buildReading(diff){
+  const hard = (diff==="hard");
+  const diffLabel = hard ? "Very Hard" : "Medium";
+  const qs = [];
+
+  const passages = [
+`Passage A (Prose Fiction)
+Mara counted the steps between streetlights the way other people counted sheep. It was a habit she’d picked up during late shifts at the bakery, when the city seemed to inhale and hold its breath. The streetlights never moved, of course, but their pools of light made the sidewalk feel measurable—like something that could be finished.
+
+Tonight, she walked faster than usual. Her phone buzzed with a message from her brother: “You coming?” She didn’t reply. Not because she didn’t care, but because answering felt like choosing a version of the evening before she’d reached it. At the corner, a delivery truck idled, its engine a low hum. The driver waved her across with a flick of two fingers, as if ushering her into a scene already rehearsed.
+
+Mara passed the park where the swings squeaked in the wind even though no one sat on them. She remembered being small enough to kick the air and believe she was flying. Now, she noticed the rust at the joints and the way one chain hung slightly longer than the other. Details, she thought, were what adulthood was made of: not new discoveries, but old things seen differently.
+
+At the café, the window glowed warm. Inside, her brother held two mugs as if they were fragile evidence. When he saw her, his shoulders dropped a fraction—relief that looked almost like laughter.`,
+`Passage B (Social Science)
+When people describe “multitasking,” they often mean rapid switching. The brain, in most everyday conditions, does not run two effortful tasks in parallel; it toggles attention. That toggling can feel smooth, but it carries a cost: each switch requires a small re-orientation. Multiply that cost across dozens of switches, and you get the familiar end-of-day sensation of being busy yet oddly unaccomplished.
+
+Researchers have found that the cost of switching increases when tasks share similar mental resources. For example, composing a message while listening to spoken instructions is harder than composing a message while walking, because both the message and the instructions compete for language processing. People tend to underestimate this interference, partly because the moment-to-moment experience of switching feels productive.
+
+The practical implication is not that people should avoid variety, but that they should be strategic about it. Grouping similar tasks reduces the number of switches and increases the time spent in sustained focus. Even brief “batching”—answering messages in a designated window rather than continuously—can make complex work feel less resistant.`,
+`Passage C (Humanities)
+Restoration is not the same as re-creation. When conservators clean a painting, they do not aim to make it “new,” because newness can erase history. A crackle in varnish or a darkened pigment may reveal the materials and choices of a specific period. Yet leaving everything untouched can also distort the artist’s intent if dirt or later overpainting has shifted the original balance of light and color.
+
+This tension has led to debates about authenticity. Is authenticity located in the artist’s first brushstrokes, in the object as it has aged, or in the viewer’s encounter with it today? Many museums adopt a principle of reversibility: interventions should be removable without harming the original. That way, future conservators—armed with better methods—can revise earlier choices.
+
+In this sense, conservation is an argument across time. Each treatment is a claim about what matters most: stability, readability, or historical record. The goal is less to freeze an object than to keep it available for continued interpretation.`,
+`Passage D (Natural Science)
+In a river, water rarely flows at the same speed from bank to bank. Near the banks and riverbed, friction slows the current, while the center tends to move faster. After heavy rain, the difference can become more dramatic because the river’s volume increases and the main channel deepens.
+
+This uneven flow shapes what the river carries. Larger particles like sand and gravel usually travel along the bottom, rolling and bouncing in short bursts. Finer particles like silt can remain suspended longer, especially in faster, turbulent water. Over time, the river sorts these materials, depositing heavier particles where the current slows—such as inside bends—and transporting lighter particles farther downstream.
+
+Because of this sorting, riverbanks can record past flow conditions. A layer rich in coarse grains may indicate a period of high energy, perhaps a storm season. A layer dominated by fine silt may suggest calmer flow. Reading these layers helps scientists infer how waterways responded to past climate patterns.`
+  ];
+
+  function addQ(passageIdx, skill, stem, choices, ans, expl){
+    const qNum = qs.length+1;
+    const header = `(${qNum}) Based on Passage ${String.fromCharCode(65+passageIdx)}:\n`;
+    const prompt = header + stem;
+    qs.push(mkQ("Reading", skill, diffLabel, prompt, choices, ans, expl));
+  }
+
+  // Passage A (5)
+  addQ(0,"Main idea","The passage primarily emphasizes Mara’s shift from:",["speed to stillness","childlike perception to adult noticing","fear to confidence","isolation to anger"],1,
+    "Mara compares childhood impressions with adult attention to details like rust and uneven chains.");
+  addQ(0,"Inference","Mara doesn’t reply to her brother’s text mainly because she:",["has no phone service","wants to avoid committing emotionally","is angry with him","is too busy counting steps"],1,
+    "She says replying feels like choosing a version of the evening before arriving.");
+  addQ(0,"Detail","Which image best supports the idea that the city feels “measurable” to Mara?",["the bakery’s ovens","pools of streetlight","the café window","the delivery truck"],1,
+    "She counts steps between streetlights and describes their light as measurable.");
+  addQ(0,"Tone","The tone near the end (“fragile evidence”) is best described as:",["mocking","tender and cautious","scientific and detached","sarcastic"],1,
+    "The mugs represent something emotionally meaningful; the language is gentle.");
+  addQ(0,"Purpose of detail","The uneven swing chain mainly highlights:",["poor park maintenance only","Mara’s attention to small changes","danger in the park","a coming storm"],1,
+    "It’s used to show how she sees old things differently now.");
+
+  // Passage B (5)
+  addQ(1,"Author’s claim","The author argues that multitasking is usually:",["true parallel processing","rapid attention switching","a myth with no benefits","only possible for experts"],1,
+    "They define multitasking as toggling attention rather than doing both at once.");
+  addQ(1,"Cause/effect","Switching costs increase most when tasks:",["use different senses","share mental resources","are enjoyable","are done while walking"],1,
+    "Language-on-language interference is the example.");
+  addQ(1,"Inference","People underestimate interference primarily because:",["they have poor memory","switching feels productive in the moment","they dislike instructions","research is unclear"],1,
+    "The passage states switching feels smooth and productive.");
+  addQ(1,"Best recommendation","Which strategy aligns with the passage’s advice?",["Reply to every message immediately","Batch similar tasks into windows","Avoid all variety","Do two language tasks simultaneously"],1,
+    "Batching reduces the number of costly switches.");
+  addQ(1,"Meaning in context","“resistant” most nearly means:",["strong","stubborn","difficult to start","unrelated"],2,
+    "Complex work can feel hard to begin when constantly switching.");
+
+  // Passage C (5)
+  addQ(2,"Central idea","The passage mainly discusses:",["how to paint realistically","debates in art conservation","museum ticket pricing","why artists prefer varnish"],1,
+    "It focuses on restoration vs re-creation and authenticity/reversibility.");
+  addQ(2,"Contrast","The tension described is between:",["history and weather","newness and interpretation","leaving age marks and preserving intent","artists and viewers"],2,
+    "Leaving everything untouched may distort intent; cleaning can erase history.");
+  addQ(2,"Definition","“reversibility” refers to interventions that:",["are permanent improvements","can be removed without harm","are cheaper","use only water"],1,
+    "Explicitly defined in the passage.");
+  addQ(2,"Inference","Calling conservation “an argument across time” suggests:",["conservators dislike art","choices may be revised by future experts","paintings never age","museums avoid decisions"],1,
+    "Future conservators can revise earlier choices using better methods.");
+  addQ(2,"Purpose","The author mentions crackle and pigments to:",["criticize old materials","show age can carry information","prove all paintings are dirty","argue for repainting"],1,
+    "Age marks can reveal history and period materials.");
+
+  // Passage D (5)
+  addQ(3,"Main idea","The passage explains how uneven flow affects:",["fish migration only","sediment transport and deposition","water temperature","river color perception"],1,
+    "It describes sorting and deposition patterns.");
+  addQ(3,"Detail","Heavier particles are most likely deposited where:",["current speeds up","current slows","water is deepest","banks are steep"],1,
+    "Inside bends and slow zones deposit heavier grains.");
+  addQ(3,"Inference","A layer rich in coarse grains most likely indicates:",["calm conditions","high-energy flow (storms)","a drought","pollution"],1,
+    "Coarse grains require higher energy to move/deposit.");
+  addQ(3,"Meaning in context","“turbulent” most nearly means:",["smooth","chaotic","frozen","silent"],1,
+    "Turbulence implies irregular, chaotic motion.");
+  addQ(3,"Author’s purpose","The final sentence mainly shows that layers can be used to:",["predict today’s weather exactly","infer past climate responses","measure river pH","count fish populations"],1,
+    "Scientists infer how waterways responded to past climate patterns.");
+
+  // Hard mode tweaks
+  if(hard){
+    qs[1].choices = ["is tired of constant messages","wants to avoid committing emotionally","is annoyed by the café","is lost and confused"];
+    qs[6].choices = ["the brain can’t switch at all","switching feels productive in the moment","all tasks require the same resources","interference happens only at night"];
+    qs[13].choices = ["choices may be revised by future experts","conservation ends debate permanently","artists control every viewing experience","museums refuse to intervene"];
+    qs[18].choices = ["infer past climate responses","prove climate never changes","predict the next storm precisely","avoid collecting data"];
+  }
+
+  return qs;
+}
+
+// Science: 4 mini “studies” × 5 questions = 20
+function buildScience(diff){
+  const hard = (diff==="hard");
+  const diffLabel = hard ? "Very Hard" : "Medium";
+  const qs = [];
+
+  const study1 =
+`Study 1: Reaction Rate vs Temperature
+A student measures how fast a tablet dissolves in water at different temperatures.
+
+Table 1
+Temp (°C):   10   20   30   40
+Time (s):   120   80   55   40
+
+Assume faster reaction = shorter time.`;
+
+  const study2 =
+`Study 2: Plant Growth Under Light Colors
+Two groups of identical plants are grown for 14 days with different LED colors.
+
+Table 2
+Light:       Blue   Red   White
+Avg height:  12 cm  15 cm  14 cm
+All other conditions were controlled.`;
+
+  const study3 =
+`Study 3: Pendulum Period
+A pendulum’s period (time for one full swing) is measured at different string lengths.
+
+Table 3
+Length (cm):  25   50   75  100
+Period (s):   1.0  1.4  1.7  2.0`;
+
+  const study4 =
+`Study 4: Battery Drain in Two Apps
+A phone starts at 100% battery. After 30 minutes:
+
+App A: 88%
+App B: 82%
+A second trial shows:
+App A: 90%
+App B: 81%`;
+
+  function addQ(studyText, skill, stem, choices, ans, expl){
+    const qNum = qs.length+1;
+    const prompt = `(${qNum}) ${studyText}\n\n${stem}`;
+    qs.push(mkQ("Science", skill, diffLabel, prompt, choices, ans, expl));
+  }
+
+  // Study 1 (5)
+  addQ(study1,"Data interpretation","As temperature increases from 10°C to 40°C, dissolving time:",["increases","decreases","stays constant","cannot be determined"],1,
+    "Time drops from 120s to 40s as temperature rises.");
+  addQ(study1,"Trend reasoning","Which temperature shows the fastest dissolving?",["10°C","20°C","30°C","40°C"],3,
+    "Fastest = shortest time, which is 40s at 40°C.");
+  addQ(study1,"Proportional thinking","From 20°C to 40°C, time decreases by:",["20 s","30 s","40 s","80 s"],2,
+    "80s → 40s is a 40-second decrease.");
+  addQ(study1,"Scientific explanation","A likely reason dissolving is faster at higher temperature is:",["fewer collisions","more particle motion and collisions","water becomes heavier","tablet surface becomes smaller"],1,
+    "Higher temperature increases molecular motion, increasing collision frequency.");
+  addQ(study1,"Experimental design","A controlled variable should be:",["water temperature","tablet brand/type","time measured","reaction speed"],1,
+    "To test temperature, keep tablet type constant.");
+
+  // Study 2 (5)
+  addQ(study2,"Data interpretation","Which light produced the greatest average height?",["Blue","Red","White","All equal"],1,
+    "Red light shows 15 cm, the highest.");
+  addQ(study2,"Control reasoning","The phrase “all other conditions controlled” means:",["only light color changed","no measurements were taken","plants were different species","the results are guaranteed"],0,
+    "Controls isolate the independent variable (light color).");
+  addQ(study2,"Inference","A reasonable conclusion is:",["Blue causes tallest plants always","Red increased height under these conditions","White prevents growth","Light color has no effect"],1,
+    "Red produced the greatest average height in this experiment.");
+  addQ(study2,"Next step","To strengthen the conclusion, the best next step is to:",["repeat with more plants/trials","change multiple variables at once","remove measurements","use different species only"],0,
+    "Replication reduces chance effects and improves reliability.");
+  addQ(study2,"Variables","The dependent variable is:",["light color","plant height","type of soil","number of days"],1,
+    "Measured outcome = plant height.");
+
+  // Study 3 (5)
+  addQ(study3,"Trend","As length increases, the period:",["decreases","increases","stays constant","becomes zero"],1,
+    "Period rises from 1.0s to 2.0s as length increases.");
+  addQ(study3,"Approximation","The period at 75 cm is closest to:",["1.0 s","1.4 s","1.7 s","2.0 s"],2,
+    "Table shows 1.7 s at 75 cm.");
+  addQ(study3,"Rate of change","From 25 cm to 100 cm, period increases by:",["0.5 s","1.0 s","1.5 s","2.0 s"],1,
+    "2.0 − 1.0 = 1.0 s.");
+  addQ(study3,"Prediction","At 125 cm, the period would most likely be:",["less than 2.0 s","about 2.2–2.4 s","exactly 2.0 s","0.5 s"],1,
+    "Trend suggests slightly higher than 2.0s; linear-ish increase points near 2.3s.");
+  addQ(study3,"Experimental design","A potential source of error is:",["measuring length","counting swings inaccurately","using a string","having a stopwatch"],1,
+    "Human timing/counting introduces variability.");
+
+  // Study 4 (5)
+  addQ(study4,"Data interpretation","Across both trials, which app drained more battery in 30 minutes?",["App A","App B","Same","Cannot be determined"],1,
+    "App B ends lower both times (82%, 81%), meaning more drain.");
+  addQ(study4,"Consistency","Which app shows more consistent battery results across trials?",["App A","App B","Both equal","Neither"],1,
+    "App B: 82 → 81 (1% change). App A: 88 → 90 (2% change).");
+  addQ(study4,"Inference","A reasonable inference is:",["App B uses more power than App A","App A uses more power always","Battery % is unrelated to apps","Both apps use identical power"],0,
+    "Both trials show more drain with App B.");
+  addQ(study4,"Controls","A key control for this test would be:",["different phones each trial","same phone model and brightness","changing Wi-Fi settings mid-test","starting at different battery levels"],1,
+    "Brightness/phone model strongly affect drain; keep constant.");
+  addQ(study4,"Conclusion quality","The conclusion would be strongest if:",["one trial is used only","many trials on multiple days are used","numbers are estimated","phones are different"],1,
+    "More trials improve reliability and reduce random variation.");
+
+  // Hard mode: make a handful trickier
+  if(hard){
+    qs[0].prompt = qs[0].prompt.replace("dissolving time:","dissolving time MOST directly shows an:");
+    qs[0].choices = ["direct relationship","inverse relationship","no relationship","exponential increase"];
+    qs[0].answerIndex = 1;
+    qs[0].explanation = "As temperature increases, time decreases: that's an inverse relationship.";
+
+    qs[7].choices = ["Red increased height under these conditions","Red will always maximize height for all plants","Blue prevents growth in sunlight","White causes disease"];
+    qs[7].answerIndex = 0;
+    qs[7].explanation = "ACT science favors conclusions limited to the conditions tested; avoid 'always' claims.";
+
+    qs[13].choices = ["about 2.1 s","about 2.3 s","exactly 2.0 s","about 1.7 s"];
+    qs[13].answerIndex = 1;
+
+    qs[18].choices = ["different phones each trial","same phone model and brightness","changing Wi-Fi settings mid-test","starting at different battery levels"];
+    qs[18].answerIndex = 1;
+  }
+
+  return qs;
+}
+
+function buildExam(diff){
+  const E = buildEnglish(diff);
+  const M = buildMath(diff);
+  const R = buildReading(diff);
+  const S = buildScience(diff);
+  return [...E, ...M, ...R, ...S];
+}
+
+/* ===========================
+   APP STATE + LOGIC
+   =========================== */
+
+const els = {
+  statusPill: document.getElementById("statusPill"),
+  difficultySel: document.getElementById("difficultySel"),
+  resetBtn: document.getElementById("resetBtn"),
+  startBtn: document.getElementById("startBtn"),
+  pauseBtn: document.getElementById("pauseBtn"),
+  resumeBtn: document.getElementById("resumeBtn"),
+  finishBtn: document.getElementById("finishBtn"),
+  sectionTitle: document.getElementById("sectionTitle"),
+  sectionDesc: document.getElementById("sectionDesc"),
+  kpiSection: document.getElementById("kpiSection"),
+  kpiPacing: document.getElementById("kpiPacing"),
+  kpiTime: document.getElementById("kpiTime"),
+  kpiTotalTime: document.getElementById("kpiTotalTime"),
+  kpiProgress: document.getElementById("kpiProgress"),
+  progressBar: document.getElementById("progressBar"),
+  questionArea: document.getElementById("questionArea"),
+  qNum: document.getElementById("qNum"),
+  qSkill: document.getElementById("qSkill"),
+  qDiff: document.getElementById("qDiff"),
+  qPrompt: document.getElementById("qPrompt"),
+  qChoices: document.getElementById("qChoices"),
+  flagBtn: document.getElementById("flagBtn"),
+  prevBtn: document.getElementById("prevBtn"),
+  nextBtn: document.getElementById("nextBtn"),
+  toSectionBtn: document.getElementById("toSectionBtn"),
+  navHint: document.getElementById("navHint"),
+  resultsArea: document.getElementById("resultsArea"),
+  rawTotal: document.getElementById("rawTotal"),
+  estComposite: document.getElementById("estComposite"),
+  savedOk: document.getElementById("savedOk"),
+  sectionTable: document.getElementById("sectionTable"),
+  reviewList: document.getElementById("reviewList"),
+  printBtn: document.getElementById("printBtn"),
+  exportBtn: document.getElementById("exportBtn"),
+  exportOut: document.getElementById("exportOut"),
+  restartBtn: document.getElementById("restartBtn"),
+  history: document.getElementById("history")
+};
+
+let state = null;
+let tickHandle = null;
+
+function fmtTime(sec){
+  sec = Math.max(0, Math.floor(sec));
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return `${m}:${String(s).padStart(2,"0")}`;
+}
+function nowISO(){ return new Date().toISOString(); }
+
+function initState(){
+  const diff = els.difficultySel.value;
+  const questions = buildExam(diff);
+
+  // Precompute indices for sections
+  const sectionRanges = {};
+  let idx = 0;
+  for(const name of SECTION_ORDER){
+    sectionRanges[name] = { start: idx, end: idx + SECTION_LIMITS[name] - 1 };
+    idx += SECTION_LIMITS[name];
+  }
+
+  const totalTime = SECTION_ORDER.reduce((a,s)=>a+SECTION_TIMES_SEC[s],0);
+
+  state = {
+    diff,
+    questions,
+    answers: Array(questions.length).fill(null),  // selected answerIndex
+    flags: Array(questions.length).fill(false),
+    startedAt: null,
+    finishedAt: null,
+    running: false,
+    curSection: "English",
+    curIndex: sectionRanges["English"].start,
+    sectionTimeLeft: {...SECTION_TIMES_SEC},
+    totalTimeLeft: totalTime,
+    sectionRanges
+  };
+}
+
+function setStatus(text){
+  els.statusPill.textContent = text;
+}
+
+function updateHistory(){
+  const key = "act_half_history_v1";
+  const raw = localStorage.getItem(key);
+  const history = raw ? JSON.parse(raw) : [];
+  if(history.length===0){
+    els.history.innerHTML = `<div class="muted">No attempts yet.</div>`;
+    return;
+  }
+  const rows = history.slice().reverse().map((h,i)=>{
+    return `
+      <div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px">
+        <div class="row">
+          <b>${new Date(h.finishedAt).toLocaleString()}</b>
+          <span class="tag">${h.diff==="hard"?"Very Hard":"Medium"}</span>
+          <div class="spacer"></div>
+          <span class="pill" style="background:rgba(26,115,232,.2);border-color:rgba(26,115,232,.3)">${h.rawTotal}/108</span>
+        </div>
+        <div class="muted mini">Section raw: E ${h.sections.English.raw}/38 • M ${h.sections.Math.raw}/30 • R ${h.sections.Reading.raw}/20 • S ${h.sections.Science.raw}/20</div>
+      </div>
+    `;
+  }).join("");
+  els.history.innerHTML = rows;
+}
+
+function saveAttempt(result){
+  const key = "act_half_history_v1";
+  const raw = localStorage.getItem(key);
+  const history = raw ? JSON.parse(raw) : [];
+  history.push(result);
+  localStorage.setItem(key, JSON.stringify(history.slice(-30))); // keep last 30
+}
+
+function renderKPI(){
+  if(!state) return;
+  els.kpiSection.textContent = state.curSection;
+  els.kpiPacing.textContent = `Section time left: ${fmtTime(state.sectionTimeLeft[state.curSection])}`;
+  els.kpiTime.textContent = fmtTime(state.sectionTimeLeft[state.curSection]);
+  els.kpiTotalTime.textContent = `Total time left: ${fmtTime(state.totalTimeLeft)}`;
+
+  const answered = state.answers.filter(a=>a!==null).length;
+  els.kpiProgress.textContent = `${answered}/${state.questions.length} answered`;
+  els.progressBar.style.width = `${Math.round(100*answered/state.questions.length)}%`;
+}
+
+function renderQuestion(){
+  if(!state) return;
+  const q = state.questions[state.curIndex];
+  els.sectionTitle.textContent = `${q.section} — Practice`;
+  els.sectionDesc.textContent = `Difficulty: ${q.diff}. Answer choices, flag items, and pace with the timer.`;
+  els.questionArea.classList.remove("hidden");
+  els.resultsArea.classList.add("hidden");
+
+  els.kpiSection.textContent = q.section;
+
+  els.qNum.textContent = `Q${state.curIndex+1} (${q.section})`;
+  els.qSkill.textContent = q.skill;
+  els.qDiff.textContent = q.diff;
+
+  els.qPrompt.textContent = q.prompt;
+
+  // choices
+  els.qChoices.innerHTML = "";
+  const saved = state.answers[state.curIndex];
+  q.choices.forEach((choiceText, i)=>{
+    const id = `q_${state.curIndex}_c_${i}`;
+    const lab = document.createElement("label");
+    lab.className = "choice";
+    lab.htmlFor = id;
+
+    const inp = document.createElement("input");
+    inp.type = "radio";
+    inp.name = `q_${state.curIndex}`;
+    inp.id = id;
+    inp.checked = (saved===i);
+    inp.addEventListener("change", ()=>{
+      state.answers[state.curIndex] = i;
+      renderKPI();
+      renderNavHint();
+    });
+
+    const span = document.createElement("div");
+    span.textContent = `${String.fromCharCode(65+i)}) ${choiceText}`;
+
+    lab.appendChild(inp);
+    lab.appendChild(span);
+    els.qChoices.appendChild(lab);
+  });
+
+  // flag button
+  els.flagBtn.textContent = state.flags[state.curIndex] ? "Flagged ✓" : "Flag";
+  els.flagBtn.classList.toggle("warn", state.flags[state.curIndex]);
+
+  // nav buttons
+  els.prevBtn.disabled = (state.curIndex===0);
+  els.nextBtn.disabled = (state.curIndex===state.questions.length-1);
+
+  renderNavHint();
+  renderKPI();
+
+  // show "Next Section" only at end of section
+  const r = state.sectionRanges[state.curSection];
+  els.toSectionBtn.disabled = (state.curIndex!==r.end);
+}
+
+function renderNavHint(){
+  const r = state.sectionRanges[state.curSection];
+  const flaggedCount = state.flags.reduce((a,b)=>a+(b?1:0),0);
+  const unanswered = state.answers.filter(a=>a===null).length;
+
+  const sectionAnswered = state.answers.slice(r.start, r.end+1).filter(a=>a!==null).length;
+  els.navHint.innerHTML = `
+    <span class="muted">In ${state.curSection}: </span>
+    <b>${sectionAnswered}/${(r.end-r.start+1)}</b> answered •
+    <span class="${unanswered? "warn":"good"}">${unanswered} unanswered</span> •
+    <span class="muted">${flaggedCount} flagged total</span>
+  `;
+}
+
+function startExam(){
+  initState();
+  state.startedAt = nowISO();
+  state.running = true;
+
+  setStatus("Running");
+  els.startBtn.disabled = true;
+  els.pauseBtn.disabled = false;
+  els.resumeBtn.disabled = true;
+  els.finishBtn.disabled = false;
+
+  tickHandle = setInterval(tick, 250);
+  renderQuestion();
+}
+
+function pauseExam(){
+  if(!state) return;
+  state.running = false;
+  setStatus("Paused");
+  els.pauseBtn.disabled = true;
+  els.resumeBtn.disabled = false;
+}
+
+function resumeExam(){
+  if(!state) return;
+  state.running = true;
+  setStatus("Running");
+  els.pauseBtn.disabled = false;
+  els.resumeBtn.disabled = true;
+}
+
+function tick(){
+  if(!state || !state.running) { renderKPI(); return; }
+
+  // decrement ~1 sec per second using wall-clock to avoid drift
+  if(!tick.last){ tick.last = performance.now(); }
+  const t = performance.now();
+  const dt = (t - tick.last) / 1000;
+  if(dt < 1) { renderKPI(); return; }
+  const steps = Math.floor(dt);
+  tick.last += steps*1000;
+
+  // reduce time
+  state.sectionTimeLeft[state.curSection] -= steps;
+  state.totalTimeLeft -= steps;
+
+  // time up behavior
+  if(state.sectionTimeLeft[state.curSection] <= 0){
+    state.sectionTimeLeft[state.curSection] = 0;
+    // auto-advance section (or finish if last)
+    advanceSection(true);
+  }
+  if(state.totalTimeLeft <= 0){
+    state.totalTimeLeft = 0;
+    finishAndGrade();
+  }
+  renderKPI();
+}
+
+function setSection(sectionName){
+  state.curSection = sectionName;
+  const r = state.sectionRanges[sectionName];
+  // jump to first unanswered within section, else start
+  let target = r.start;
+  for(let i=r.start;i<=r.end;i++){
+    if(state.answers[i]===null){ target=i; break; }
+  }
+  state.curIndex = target;
+  renderQuestion();
+}
+
+function advanceSection(fromTimer=false){
+  const curIdx = SECTION_ORDER.indexOf(state.curSection);
+  if(curIdx === SECTION_ORDER.length-1){
+    if(fromTimer) finishAndGrade();
+    return;
+  }
+  const nextSec = SECTION_ORDER[curIdx+1];
+  setSection(nextSec);
+}
+
+function prevQ(){
+  if(state.curIndex>0){
+    state.curIndex--;
+    state.curSection = state.questions[state.curIndex].section;
+    renderQuestion();
+  }
+}
+function nextQ(){
+  if(state.curIndex<state.questions.length-1){
+    state.curIndex++;
+    state.curSection = state.questions[state.curIndex].section;
+    renderQuestion();
+  }
+}
+
+function toggleFlag(){
+  state.flags[state.curIndex] = !state.flags[state.curIndex];
+  renderQuestion();
+}
+
+function finishAndGrade(){
+  if(!state) return;
+  state.running = false;
+  state.finishedAt = nowISO();
+  clearInterval(tickHandle);
+  tickHandle = null;
+  tick.last = null;
+
+  // grade
+  const perSection = {};
+  for(const s of SECTION_ORDER){
+    perSection[s] = { raw:0, total:SECTION_LIMITS[s], skills:{} };
+  }
+  let rawTotal = 0;
+
+  const review = state.questions.map((q, i)=>{
+    const user = state.answers[i];
+    const correct = (user === q.answerIndex);
+    if(correct){ rawTotal++; perSection[q.section].raw++; }
+    perSection[q.section].skills[q.skill] = perSection[q.section].skills[q.skill] || { correct:0, total:0 };
+    perSection[q.section].skills[q.skill].total++;
+    if(correct) perSection[q.section].skills[q.skill].correct++;
+    return { i, q, user, correct, flagged: state.flags[i] };
+  });
+
+  // rough estimate: map % to 1–36
+  const pct = rawTotal / state.questions.length;
+  let est = Math.round(1 + pct*35);
+  est = Math.max(1, Math.min(36, est));
+
+  // Save attempt
+  const attempt = {
+    startedAt: state.startedAt,
+    finishedAt: state.finishedAt,
+    diff: state.diff,
+    rawTotal,
+    sections: Object.fromEntries(SECTION_ORDER.map(s=>[s,{raw:perSection[s].raw,total:perSection[s].total}])),
+    answers: state.answers,
+    flags: state.flags
+  };
+  saveAttempt(attempt);
+
+  // Render results
+  els.questionArea.classList.add("hidden");
+  els.resultsArea.classList.remove("hidden");
+  els.sectionTitle.textContent = "Graded Results";
+  els.sectionDesc.textContent = "Use the feedback focus + explanations to target improvement.";
+
+  els.rawTotal.textContent = `${rawTotal}`;
+  els.estComposite.textContent = `${est}`;
+  els.savedOk.textContent = "Yes";
+
+  // Section table with focus
+  els.sectionTable.innerHTML = "";
+  for(const s of SECTION_ORDER){
+    const raw = perSection[s].raw;
+    const total = perSection[s].total;
+    const percent = Math.round(100*raw/total);
+
+    // pick 2 weakest skills
+    const skillArr = Object.entries(perSection[s].skills).map(([k,v])=>({k, pct: v.correct/v.total, correct:v.correct,total:v.total}));
+    skillArr.sort((a,b)=>a.pct-b.pct);
+    const weak = skillArr.slice(0,2).map(x=>`${x.k} (${x.correct}/${x.total})`).join("; ") || "—";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><b>${s}</b></td>
+      <td class="center"><b>${raw}</b> / ${total}</td>
+      <td class="center">${percent}%</td>
+      <td>${weak}</td>
+    `;
+    els.sectionTable.appendChild(tr);
+  }
+
+  // Review list
+  els.reviewList.innerHTML = "";
+  review.forEach(r=>{
+    const q = r.q;
+    const user = r.user;
+    const userTxt = (user===null) ? "—" : `${String.fromCharCode(65+user)}) ${q.choices[user]}`;
+    const ansTxt = `${String.fromCharCode(65+q.answerIndex)}) ${q.choices[q.answerIndex]}`;
+    const div = document.createElement("div");
+    div.style.border = "1px solid var(--border)";
+    div.style.borderRadius = "10px";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+    div.innerHTML = `
+      <div class="row">
+        <b>Q${r.i+1} — ${q.section}</b>
+        <span class="tag">${q.skill}</span>
+        <span class="tag">${q.diff}</span>
+        ${r.flagged ? `<span class="tag warn">Flagged</span>` : ``}
+        <div class="spacer"></div>
+        <span class="${r.correct ? "good":"bad"}">${r.correct ? "Correct":"Incorrect"}</span>
+      </div>
+      <div class="muted mini" style="margin-top:6px;white-space:pre-wrap">${q.prompt}</div>
+      <div style="margin-top:8px"><b>Your answer:</b> ${userTxt}</div>
+      <div><b>Correct answer:</b> ${ansTxt}</div>
+      <div class="muted" style="margin-top:6px"><b>Explanation:</b> ${q.explanation}</div>
+    `;
+    els.reviewList.appendChild(div);
+  });
+
+  updateHistory();
+
+  // buttons
+  els.pauseBtn.disabled = true;
+  els.resumeBtn.disabled = true;
+  els.finishBtn.disabled = true;
+  setStatus("Finished");
+}
+
+function resetAll(){
+  if(tickHandle) clearInterval(tickHandle);
+  tickHandle = null;
+  tick.last = null;
+  state = null;
+
+  setStatus("Not started");
+  els.startBtn.disabled = false;
+  els.pauseBtn.disabled = true;
+  els.resumeBtn.disabled = true;
+  els.finishBtn.disabled = true;
+
+  els.questionArea.classList.add("hidden");
+  els.resultsArea.classList.add("hidden");
+  els.sectionTitle.textContent = "Setup";
+  els.sectionDesc.textContent = "Choose difficulty, then start. Timers match half-length ACT pacing.";
+
+  els.kpiSection.textContent = "—";
+  els.kpiPacing.textContent = "—";
+  els.kpiTime.textContent = "—";
+  els.kpiTotalTime.textContent = "—";
+  els.kpiProgress.textContent = "—";
+  els.progressBar.style.width = "0%";
+  els.exportOut.classList.add("hidden");
+  els.exportOut.textContent = "";
+}
+
+function printResults(){
+  window.print();
+}
+
+function exportAttempt(){
+  const key = "act_half_history_v1";
+  const raw = localStorage.getItem(key);
+  const history = raw ? JSON.parse(raw) : [];
+  const latest = history[history.length-1] || null;
+  els.exportOut.classList.remove("hidden");
+  els.exportOut.textContent = latest ? JSON.stringify(latest, null, 2) : "No attempt found.";
+}
+
+function restartNew(){
+  resetAll();
+  startExam();
+}
+
+/* ===========================
+   EVENTS
+   =========================== */
+els.startBtn.addEventListener("click", startExam);
+els.pauseBtn.addEventListener("click", pauseExam);
+els.resumeBtn.addEventListener("click", resumeExam);
+els.finishBtn.addEventListener("click", finishAndGrade);
+els.resetBtn.addEventListener("click", resetAll);
+
+els.prevBtn.addEventListener("click", prevQ);
+els.nextBtn.addEventListener("click", nextQ);
+els.flagBtn.addEventListener("click", toggleFlag);
+els.toSectionBtn.addEventListener("click", ()=>advanceSection(false));
+
+els.printBtn.addEventListener("click", printResults);
+els.exportBtn.addEventListener("click", exportAttempt);
+els.restartBtn.addEventListener("click", restartNew);
+
+updateHistory();
+resetAll();
+</script>
+</body>
+</html>
